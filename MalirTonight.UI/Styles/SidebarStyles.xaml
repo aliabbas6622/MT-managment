@@ -2,16 +2,18 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
+    <!-- Modern Sidebar Button Style with smooth transitions -->
     <Style x:Key="SidebarButton" TargetType="Button">
-        <Setter Property="Height" Value="48" />
+        <Setter Property="Height" Value="52" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="16,0,16,0" />
+        <Setter Property="Padding" Value="20,0,20,0" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -21,17 +23,21 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True"
-                            CornerRadius="8"
-                            Margin="12,4,12,4">
+                            CornerRadius="12"
+                            Margin="8,4,8,4">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <ContentPresenter Grid.Column="0"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="0,0,16,0" />
+                            <Border Grid.Column="0" 
+                                    Background="{TemplateBinding Foreground}" 
+                                    CornerRadius="6"
+                                    Padding="8"
+                                    Margin="0,0,12,0">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                            </Border>
                             <ContentPresenter Grid.Column="1"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="Center"
@@ -40,16 +46,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
-                            <Setter TargetName="Border" Property="Opacity" Value="0.08" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                            <Setter TargetName="Border" Property="Opacity" Value="0.15" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-                            <Setter TargetName="Border" Property="Opacity" Value="0.12" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
-                            <Setter TargetName="Border" Property="Opacity" Value="0.08" />
+                            <Setter TargetName="Border" Property="Opacity" Value="0.25" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -58,45 +60,89 @@
     </Style>
 
     <Style x:Key="SidebarHeaderText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
         <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Opacity" Value="0.5" />
-        <Setter Property="Margin" Value="16,16,16,8" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Opacity" Value="0.7" />
+        <Setter Property="Margin" Value="20,20,20,12" />
+        <Setter Property="LetterSpacing" Value="0.5" />
     </Style>
 
+    <!-- Enhanced Card Style with better shadows -->
     <Style x:Key="CardStyle" TargetType="materialDesign:Card" BasedOn="{StaticResource MaterialDesignCard}">
         <Setter Property="Padding" Value="24" />
-        <Setter Property="UniformCornerRadius" Value="12" />
+        <Setter Property="UniformCornerRadius" Value="16" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.08" Direction="270" Color="Black" />
+                <DropShadowEffect ShadowDepth="2" BlurRadius="20" Opacity="0.12" Direction="270" Color="#000000" />
             </Setter.Value>
         </Setter>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
     </Style>
 
+    <!-- Stat Card Icon with gradient background -->
     <Style x:Key="StatCardIcon" TargetType="materialDesign:PackIcon">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Opacity" Value="0.9" />
     </Style>
 
+    <!-- Large stat number display -->
     <Style x:Key="StatNumber" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="36" />
+        <Setter Property="FontSize" Value="32" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 
+    <!-- Subtle stat label -->
     <Style x:Key="StatLabel" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Opacity" Value="0.5" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Opacity" Value="0.6" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 
+    <!-- Section Title with modern styling -->
     <Style x:Key="SectionTitle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="20" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="Margin" Value="0,0,0,20" />
+    </Style>
+
+    <!-- Page Title Style -->
+    <Style x:Key="PageTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Margin" Value="0,0,0,24" />
+    </Style>
+
+    <!-- Modern TextBox Style -->
+    <Style x:Key="ModernTextBox" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="materialDesign:TextFieldAssist.HasClearButton" Value="True" />
+        <Setter Property="materialDesign:TextFieldAssist.OutlinedBorderActiveThickness" Value="2" />
+    </Style>
+
+    <!-- Modern Button Styles -->
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="24,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="UniformCornerRadius" Value="10" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="24,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="UniformCornerRadius" Value="10" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
 
 </ResourceDictionary>

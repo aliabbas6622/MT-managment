@@ -5,68 +5,201 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Margin="24">
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Margin="40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Employees" FontSize="28" FontWeight="Bold" Margin="0 0 0 16" />
+        <!-- Page Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="Employees" Style="{StaticResource PageTitle}" />
+            <TextBlock Text="Manage your team members and their information" 
+                       FontSize="14" Opacity="0.6" 
+                       Foreground="{DynamicResource MaterialDesignBody}" />
+        </StackPanel>
 
-        <Grid Grid.Row="1" Margin="0 0 0 16">
+        <!-- Action Bar -->
+        <Grid Grid.Row="1" Margin="0,0,0,24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0"
-                     materialDesign:HintAssist.Hint="Search employees..."
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     materialDesign:TextFieldAssist.HasClearButton="True" />
+            <!-- Search and Filters -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <TextBox Width="350"
+                         materialDesign:HintAssist.Hint="Search employees..."
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         FontSize="14" />
+                
+                <ComboBox Width="180" 
+                          Margin="16,0,0,0"
+                          materialDesign:HintAssist.Hint="Department"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          FontSize="14">
+                    <ComboBoxItem Content="All Departments" />
+                    <ComboBoxItem Content="Kitchen" />
+                    <ComboBoxItem Content="Service" />
+                    <ComboBoxItem Content="Management" />
+                </ComboBox>
+                
+                <ComboBox Width="150" 
+                          Margin="16,0,0,0"
+                          materialDesign:HintAssist.Hint="Status"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          FontSize="14">
+                    <ComboBoxItem Content="All Status" />
+                    <ComboBoxItem Content="Active" />
+                    <ComboBoxItem Content="On Leave" />
+                    <ComboBoxItem Content="Inactive" />
+                </ComboBox>
+            </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16 0 0 0">
-                <Button Style="{StaticResource MaterialDesignFlatButton}"
-                        Command="{Binding SearchCommand}"
-                        Margin="0 0 8 0"
-                        Content="Search" />
-                <Button Style="{StaticResource MaterialDesignFlatButton}"
+            <!-- Action Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Style="{StaticResource SecondaryButton}"
+                        Content="Export"
+                        Margin="0,0,12,0" />
+                <Button Style="{StaticResource PrimaryButton}"
                         Command="{Binding AddEmployeeCommand}"
-                        Content="+ Add Employee" />
+                        Content="+ Add Employee"
+                        Background="{DynamicResource PrimaryHueMidBrush}"
+                        Foreground="White" />
             </StackPanel>
         </Grid>
 
-        <DataGrid Grid.Row="2"
-                  ItemsSource="{Binding Employees}"
-                  SelectedItem="{Binding SelectedEmployee}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  materialDesign:DataGridAssist.CellPadding="8"
-                  materialDesign:DataGridAssist.ColumnHeaderPadding="8">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" />
-                <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="2*" />
-                <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="*" />
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
-                <DataGridTextColumn Header="Salary" Binding="{Binding BaseSalary, StringFormat={}{0:C}}" Width="*" />
-                <DataGridTemplateColumn Header="Actions" Width="120">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                        Command="{Binding DataContext.EditEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"
-                                        Content="Edit" />
-                                <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                        Command="{Binding DataContext.DeleteEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"
-                                        Content="Delete" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- Data Grid -->
+        <materialDesign:Card Grid.Row="2" Style="{StaticResource CardStyle}" Padding="0">
+            <DataGrid ItemsSource="{Binding Employees}"
+                      SelectedItem="{Binding SelectedEmployee}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      materialDesign:DataGridAssist.CellPadding="16,12"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="16,12"
+                      BorderThickness="0"
+                      RowHeight="64">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                        <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
+                        <Setter Property="Padding" Value="16,12" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Employee" Width="2.5*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="40" Height="40" 
+                                            CornerRadius="20" 
+                                            Background="{DynamicResource PrimaryHueLightBrush}">
+                                        <TextBlock Text="{Binding FullName}" 
+                                                   FontSize="16" FontWeight="Bold"
+                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                   VerticalAlignment="Center" 
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding FullName}" 
+                                                   FontSize="14" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Email}" 
+                                                   FontSize="12" Opacity="0.6" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
+                    <DataGridTextColumn Header="Phone" 
+                                        Binding="{Binding Phone}" 
+                                        Width="*" />
+                    
+                    <DataGridTemplateColumn Header="Department" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource PrimaryHueLightBrush}" 
+                                        CornerRadius="6" 
+                                        Padding="10,4">
+                                    <TextBlock Text="Kitchen" 
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
+                    <DataGridTextColumn Header="Salary" 
+                                        Binding="{Binding BaseSalary, StringFormat={}{0:C}}" 
+                                        Width="*" />
+                    
+                    <DataGridTemplateColumn Header="Status" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#4CAF50" Margin="0,0,8,0" />
+                                    <TextBlock Text="Active" FontSize="13" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
+                    <DataGridTemplateColumn Header="Actions" Width="180">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.EditEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Edit"
+                                            Width="36" Height="36"
+                                            Padding="0">
+                                        <materialDesign:PackIcon Kind="Pencil" Width="18" Height="18" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.DeleteEmployeeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Delete"
+                                            Width="36" Height="36"
+                                            Padding="0"
+                                            Foreground="{DynamicResource ErrorBrush}">
+                                        <materialDesign:PackIcon Kind="Delete" Width="18" Height="18" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                            ToolTip="View Details"
+                                            Width="36" Height="36"
+                                            Padding="0">
+                                        <materialDesign:PackIcon Kind="Eye" Width="18" Height="18" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
     </Grid>
 </UserControl>

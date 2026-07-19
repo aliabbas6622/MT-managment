@@ -1,0 +1,64 @@
+```
+# Build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.nupkg
+*.snupkg
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+
+# Dependencies
+packages/
+node_modules/
+vendor/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.userprefs
+*.userosscache
+*.suo
+*.user
+*.aps
+*.ncb
+*.opendb
+*.VC.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+desktop.ini
+
+# Log files
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+!env.example
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+*~
+.#*
+.##*
+
+# User-specific files
+*.userprefs
+*.userosscache
+```
