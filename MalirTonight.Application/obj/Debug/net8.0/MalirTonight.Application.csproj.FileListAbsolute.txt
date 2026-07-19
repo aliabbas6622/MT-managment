@@ -1,0 +1,16 @@
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\bin\Debug\net8.0\MalirTonight.Application.deps.json
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\bin\Debug\net8.0\MalirTonight.Application.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\bin\Debug\net8.0\MalirTonight.Application.pdb
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\bin\Debug\net8.0\MalirTonight.Domain.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\bin\Debug\net8.0\MalirTonight.Domain.pdb
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.csproj.AssemblyReference.cache
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.AssemblyInfoInputs.cache
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.AssemblyInfo.cs
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.csproj.CoreCompileInputs.cache
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.sourcelink.json
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTon.7E6E3FC8.Up2Date
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\refint\MalirTonight.Application.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\MalirTonight.Application.pdb
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Application\obj\Debug\net8.0\ref\MalirTonight.Application.dll

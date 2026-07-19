@@ -1,0 +1,12 @@
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\bin\Debug\net8.0\MalirTonight.Domain.deps.json
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\bin\Debug\net8.0\MalirTonight.Domain.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\bin\Debug\net8.0\MalirTonight.Domain.pdb
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.AssemblyInfoInputs.cache
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.AssemblyInfo.cs
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.csproj.CoreCompileInputs.cache
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.sourcelink.json
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\refint\MalirTonight.Domain.dll
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\MalirTonight.Domain.pdb
+C:\Users\aliab\OneDrive\Desktop\Malir Tonight\MalirTonight.Domain\obj\Debug\net8.0\ref\MalirTonight.Domain.dll
