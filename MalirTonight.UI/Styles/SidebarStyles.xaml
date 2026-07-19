@@ -57,45 +57,39 @@
         </Setter>
     </Style>
 
-    <Style x:Key="SidebarButtonActive" BasedOn="{StaticResource SidebarButton}" TargetType="Button">
-        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="Opacity" Value="0.12" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
-    </Style>
-
     <Style x:Key="SidebarHeaderText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="TextTransform" Value="Uppercase" />
-        <Setter Property="LetterSpacing" Value="1" />
         <Setter Property="Opacity" Value="0.5" />
         <Setter Property="Margin" Value="16,16,16,8" />
     </Style>
 
-    <Style x:Key="CardStyle" TargetType="materialDesign:Card">
+    <Style x:Key="CardStyle" TargetType="materialDesign:Card" BasedOn="{StaticResource MaterialDesignCard}">
         <Setter Property="Padding" Value="24" />
         <Setter Property="UniformCornerRadius" Value="12" />
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.08" Direction="270" Color="Black" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="StatCardIcon" TargetType="materialDesign:PackIcon">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
-        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style x:Key="StatNumber" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontSize" Value="36" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 
     <Style x:Key="StatLabel" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Opacity" Value="0.5" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-        <Setter Property="Opacity" Value="0.6" />
     </Style>
 
     <Style x:Key="SectionTitle" TargetType="TextBlock">

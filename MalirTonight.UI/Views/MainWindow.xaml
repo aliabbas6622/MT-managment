@@ -54,7 +54,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="{StaticResource SidebarBackground}">
+        <Border Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -62,31 +62,29 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource SidebarBorder}" Padding="24,24,24,16">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <materialDesign:PackIcon Grid.Column="0" Kind="Restaurant" Width="32" Height="32"
-                                                     Foreground="{StaticResource SidebarAccent}" VerticalAlignment="Center" />
-                            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="Malir Tonight" FontSize="18" FontWeight="Bold"
-                                           Foreground="{StaticResource SidebarText}" />
-                                <TextBlock Text="Restaurant Management" FontSize="11"
-                                           Foreground="{StaticResource SidebarTextMuted}" Margin="0,2,0,0" />
-                            </StackPanel>
-                            <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatButton}"
-                                    Command="{Binding ToggleThemeCommand}"
-                                    ToolTip="Toggle Theme"
-                                    Padding="4"
-                                    Foreground="{StaticResource SidebarTextMuted}">
-                                <materialDesign:PackIcon Kind="ThemeLightDark" Width="20" Height="20" />
-                            </Button>
-                        </Grid>
-                    </StackPanel>
+                <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource MaterialDesignDivider}" Padding="24,24,24,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <materialDesign:PackIcon Grid.Column="0" Kind="Restaurant" Width="32" Height="32"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Malir Tonight" FontSize="18" FontWeight="Bold"
+                                       Foreground="{DynamicResource MaterialDesignBody}" />
+                            <TextBlock Text="Restaurant Management" FontSize="11"
+                                       Foreground="{DynamicResource MaterialDesignBodyLight}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ToggleThemeCommand}"
+                                ToolTip="Toggle Theme"
+                                Padding="4"
+                                Foreground="{DynamicResource MaterialDesignBodyLight}">
+                            <materialDesign:PackIcon Kind="ThemeLightDark" Width="20" Height="20" />
+                        </Button>
+                    </Grid>
                 </Border>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
@@ -182,17 +180,17 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource SidebarBorder}" Padding="16,16,16,20">
+                <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MaterialDesignDivider}" Padding="16,16,16,20">
                     <StackPanel>
-                        <Border Background="{StaticResource SidebarItemHover}" CornerRadius="8" Padding="12">
+                        <Border Background="{DynamicResource MaterialDesignBackground}" CornerRadius="8" Padding="12">
                             <StackPanel>
-<TextBlock Text="LICENSE" FontSize="10" FontWeight="SemiBold"
-           Foreground="{StaticResource SidebarTextMuted}" />
+                                <TextBlock Text="LICENSE" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
                                 <TextBlock Text="{Binding CurrentLicenseTier, FallbackValue='Basic'}"
                                            FontSize="14" FontWeight="Bold"
-                                           Foreground="{StaticResource SidebarAccent}" Margin="0,4,0,0" />
+                                           Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,4,0,0" />
                                 <TextBlock Text="Malir Tonight v1.0" FontSize="10"
-                                           Foreground="{StaticResource SidebarTextMuted}" Margin="0,2,0,0" />
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" Margin="0,2,0,0" />
                             </StackPanel>
                         </Border>
                     </StackPanel>

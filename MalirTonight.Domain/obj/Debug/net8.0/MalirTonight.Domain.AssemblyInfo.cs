@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MalirTonight.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+19710d638765f98b5d96fb2a49247e0cb8b70917")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dd261cb48808ebc39b4e1c14c884183a1e421202")]
 [assembly: System.Reflection.AssemblyProductAttribute("MalirTonight.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MalirTonight.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

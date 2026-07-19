@@ -25,6 +25,8 @@ public partial class MainViewModel : ObservableObject
     public AuditLogViewModel AuditLogViewModel { get; }
     public LicensingViewModel LicensingViewModel { get; }
 
+    private readonly PaletteHelper _paletteHelper = new();
+
     public MainViewModel(
         DashboardViewModel dashboardViewModel,
         EmployeeListViewModel employeeListViewModel,
@@ -59,15 +61,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ToggleTheme()
-    {
-        var paletteHelper = new PaletteHelper();
-        var theme = paletteHelper.GetTheme();
-        theme.SetBaseTheme(theme.GetBaseTheme() == BaseTheme.Light ? BaseTheme.Dark : BaseTheme.Light);
-        paletteHelper.SetTheme(theme);
-    }
-
-    [RelayCommand]
     private void NavigateToDashboard() => CurrentView = DashboardViewModel;
 
     [RelayCommand]
@@ -99,6 +92,14 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void NavigateToLicensing() => CurrentView = LicensingViewModel;
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        var theme = _paletteHelper.GetTheme();
+        theme.SetBaseTheme(theme.GetBaseTheme() == BaseTheme.Light ? BaseTheme.Dark : BaseTheme.Light);
+        _paletteHelper.SetTheme(theme);
+    }
 
     private void NavigateToAddEmployee()
     {
