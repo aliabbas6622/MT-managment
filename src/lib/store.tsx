@@ -14,6 +14,7 @@ import type {
   Expense,
   AuditLog,
 } from "./types";
+import { addToSyncQueue } from "../services/sync.service";
 
 interface AppSettings {
   restaurantName: string;
@@ -152,10 +153,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   const addEmployee = useCallback((e: Omit<Employee, "id">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      employees: [...prev.employees, { ...e, id: nextId() }],
+      employees: [...prev.employees, { ...e, id }],
     }));
+    addToSyncQueue("employee", String(id), "create", { ...e, id });
   }, []);
 
   const updateEmployee = useCallback((id: number, data: Partial<Employee>) => {
@@ -163,6 +166,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       employees: prev.employees.map((e) => (e.id === id ? { ...e, ...data } : e)),
     }));
+    addToSyncQueue("employee", String(id), "update", { id, ...data });
   }, []);
 
   const deleteEmployee = useCallback((id: number) => {
@@ -172,13 +176,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       attendance: prev.attendance.filter((a) => a.employeeId !== id),
       leaves: prev.leaves.filter((l) => l.employeeId !== id),
     }));
+    addToSyncQueue("employee", String(id), "delete", { id });
   }, []);
 
   const addAttendance = useCallback((a: Omit<AttendanceRecord, "id">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      attendance: [...prev.attendance, { ...a, id: nextId() }],
+      attendance: [...prev.attendance, { ...a, id }],
     }));
+    addToSyncQueue("attendance", String(id), "create", { ...a, id });
   }, []);
 
   const updateAttendance = useCallback((id: number, data: Partial<AttendanceRecord>) => {
@@ -186,6 +193,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       attendance: prev.attendance.map((a) => (a.id === id ? { ...a, ...data } : a)),
     }));
+    addToSyncQueue("attendance", String(id), "update", { id, ...data });
   }, []);
 
   const deleteAttendance = useCallback((id: number) => {
@@ -193,13 +201,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       attendance: prev.attendance.filter((a) => a.id !== id),
     }));
+    addToSyncQueue("attendance", String(id), "delete", { id });
   }, []);
 
   const addLeave = useCallback((l: Omit<Leave, "id">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      leaves: [...prev.leaves, { ...l, id: nextId() }],
+      leaves: [...prev.leaves, { ...l, id }],
     }));
+    addToSyncQueue("leave", String(id), "create", { ...l, id });
   }, []);
 
   const updateLeave = useCallback((id: number, data: Partial<Leave>) => {
@@ -207,6 +218,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       leaves: prev.leaves.map((l) => (l.id === id ? { ...l, ...data } : l)),
     }));
+    addToSyncQueue("leave", String(id), "update", { id, ...data });
   }, []);
 
   const deleteLeave = useCallback((id: number) => {
@@ -214,13 +226,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       leaves: prev.leaves.filter((l) => l.id !== id),
     }));
+    addToSyncQueue("leave", String(id), "delete", { id });
   }, []);
 
   const addDepartment = useCallback((d: Omit<Department, "id" | "employeeCount">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      departments: [...prev.departments, { ...d, id: nextId(), employeeCount: 0 }],
+      departments: [...prev.departments, { ...d, id, employeeCount: 0 }],
     }));
+    addToSyncQueue("department", String(id), "create", { ...d, id });
   }, []);
 
   const updateDepartment = useCallback((id: number, data: Partial<Department>) => {
@@ -228,6 +243,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       departments: prev.departments.map((d) => (d.id === id ? { ...d, ...data } : d)),
     }));
+    addToSyncQueue("department", String(id), "update", { id, ...data });
   }, []);
 
   const deleteDepartment = useCallback((id: number): boolean => {
@@ -240,14 +256,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       return { ...prev, departments: prev.departments.filter((d) => d.id !== id) };
     });
+    if (canDelete) {
+      addToSyncQueue("department", String(id), "delete", { id });
+    }
     return canDelete;
   }, []);
 
   const addExpense = useCallback((e: Omit<Expense, "id">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      expenses: [...prev.expenses, { ...e, id: nextId() }],
+      expenses: [...prev.expenses, { ...e, id }],
     }));
+    addToSyncQueue("expense", String(id), "create", { ...e, id });
   }, []);
 
   const updateExpense = useCallback((id: number, data: Partial<Expense>) => {
@@ -255,6 +276,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       expenses: prev.expenses.map((e) => (e.id === id ? { ...e, ...data } : e)),
     }));
+    addToSyncQueue("expense", String(id), "update", { id, ...data });
   }, []);
 
   const deleteExpense = useCallback((id: number) => {
@@ -262,13 +284,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...prev,
       expenses: prev.expenses.filter((e) => e.id !== id),
     }));
+    addToSyncQueue("expense", String(id), "delete", { id });
   }, []);
 
   const addAuditLog = useCallback((log: Omit<AuditLog, "id" | "timestamp">) => {
+    const id = nextId();
     setState((prev) => ({
       ...prev,
-      auditLogs: [{ ...log, id: nextId(), timestamp: new Date().toISOString() }, ...prev.auditLogs],
+      auditLogs: [{ ...log, id, timestamp: new Date().toISOString() }, ...prev.auditLogs],
     }));
+    addToSyncQueue("audit_log", String(id), "create", { ...log, id });
   }, []);
 
   const updateSettings = useCallback((s: Partial<AppSettings>) => {

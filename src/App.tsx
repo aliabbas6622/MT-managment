@@ -1,10 +1,12 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./lib/store";
 import { LicenseProvider } from "./lib/license";
+import { AuthProvider, useAuth } from "./lib/auth";
 import ToastContainer from "./components/Toast";
 import { startSyncWorker, stopSyncWorker } from "./services/sync.service";
 import { useEffect } from "react";
 import Layout from "./components/Layout";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
@@ -18,6 +20,12 @@ import AuditLogs from "./pages/AuditLogs";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 function AppInner() {
   useEffect(() => {
     startSyncWorker();
@@ -27,7 +35,8 @@ function AppInner() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="employees" element={<Employees />} />
           <Route path="attendance" element={<Attendance />} />
@@ -49,10 +58,12 @@ function AppInner() {
 function App() {
   return (
     <AppProvider>
-      <LicenseProvider>
-        <AppInner />
-        <ToastContainer />
-      </LicenseProvider>
+      <AuthProvider>
+        <LicenseProvider>
+          <AppInner />
+          <ToastContainer />
+        </LicenseProvider>
+      </AuthProvider>
     </AppProvider>
   );
 }

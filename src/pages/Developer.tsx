@@ -1,21 +1,14 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../lib/store";
+import { useAuth } from "../lib/auth";
 import { Terminal, Database, Users, Clock, CalendarOff, DollarSign, Trash2, Download, RefreshCw } from "lucide-react";
 
-const DEV_KEY = "mt-dev-auth";
-
-export function isDevAuthenticated(): boolean {
-  return localStorage.getItem(DEV_KEY) === "true";
-}
-
-export function setDevAuth(val: boolean) {
-  if (val) localStorage.setItem(DEV_KEY, "true");
-  else localStorage.removeItem(DEV_KEY);
-}
+const DEV_SESSION_KEY = "mt-dev-session";
 
 export default function Developer() {
   const { employees, attendance, leaves, departments, expenses, auditLogs } = useApp();
-  const [authenticated, setAuthenticated] = useState(isDevAuthenticated());
+  const { user } = useAuth();
+  const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem(DEV_SESSION_KEY) === "true");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [dbSize, setDbSize] = useState("—");
@@ -27,10 +20,43 @@ export default function Developer() {
     if (raw) setDbSize(`${(new Blob([raw]).size / 1024).toFixed(1)} KB`);
   }, []);
 
-  const handleLogin = () => { if (password === DEV_PASSWORD) { setDevAuth(true); setAuthenticated(true); } else alert("Invalid developer password"); };
-  const handleClearAll = () => { if (confirm("WARNING: This will delete ALL data. Are you sure?")) { localStorage.removeItem("malir-tonight-data"); localStorage.removeItem(DEV_KEY); window.location.reload(); } };
-  const handleExportData = () => { const data = localStorage.getItem("malir-tonight-data"); if (!data) return; const blob = new Blob([data], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`; a.click(); URL.revokeObjectURL(url); };
-  const handleSeedDemo = () => { localStorage.removeItem("malir-tonight-data"); window.location.reload(); };
+  useEffect(() => {
+    if (!authenticated) sessionStorage.removeItem(DEV_SESSION_KEY);
+  }, [authenticated]);
+
+  const handleLogin = () => {
+    if (password === DEV_PASSWORD) {
+      sessionStorage.setItem(DEV_SESSION_KEY, "true");
+      setAuthenticated(true);
+    } else {
+      alert("Invalid developer password");
+    }
+  };
+
+  const handleClearAll = () => {
+    if (confirm("WARNING: This will delete ALL data. Are you sure?")) {
+      localStorage.removeItem("malir-tonight-data");
+      sessionStorage.removeItem(DEV_SESSION_KEY);
+      window.location.reload();
+    }
+  };
+
+  const handleExportData = () => {
+    const data = localStorage.getItem("malir-tonight-data");
+    if (!data) return;
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSeedDemo = () => {
+    localStorage.removeItem("malir-tonight-data");
+    window.location.reload();
+  };
 
   if (!authenticated) {
     return (
@@ -113,7 +139,7 @@ export default function Developer() {
             <h3 className="font-semibold text-slate-800">Environment Info</h3>
             <table className="w-full text-sm">
               <tbody>
-                {[["Platform", navigator.platform], ["Language", navigator.language], ["Online", navigator.onLine ? "Yes" : "No"], ["Screen", `${window.screen.width}x${window.screen.height}`]].map(([k, v]) => (
+                {[["Platform", navigator.platform], ["Language", navigator.language], ["Online", navigator.onLine ? "Yes" : "No"], ["Screen", `${window.screen.width}x${window.screen.height}`], ["Logged In As", `${user?.name || "Unknown"} (${user?.role || "none"})`]].map(([k, v]) => (
                   <tr key={String(k)} className="border-b border-slate-100 last:border-0"><td className="p-2 text-slate-500">{k}</td><td className="p-2 font-mono text-slate-700">{v}</td></tr>
                 ))}
               </tbody>
@@ -150,7 +176,7 @@ export default function Developer() {
             <h3 className="font-semibold text-slate-800 mb-3">App Info</h3>
             <table className="w-full text-sm">
               <tbody>
-                {[["App Name", "Malir Tonight"], ["Version", "1.0.0-dev"], ["Stack", "Electron + React + TypeScript + Vite + Tailwind + Prisma + SQLite"], ["License", "Basic / Premium"]].map(([k, v]) => (
+                {[["App Name", "Malir Tonight"], ["Version", "2.0.0"], ["Stack", "Electron + React + TypeScript + Vite + Tailwind + Prisma + PostgreSQL"], ["License", "Basic / Premium"], ["Auth", "RBAC (Admin, Manager, HR, Viewer)"], ["Sync", "Offline-first + AES-256-GCM"]].map(([k, v]) => (
                   <tr key={k} className="border-b border-slate-100 last:border-0"><td className="p-2 text-slate-500">{k}</td><td className="p-2 text-slate-800">{v}</td></tr>
                 ))}
               </tbody>
