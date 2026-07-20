@@ -20,9 +20,14 @@ import {
   LogOut,
   ChevronDown,
   Lock,
+  Crown,
+  CheckCircle,
 } from "lucide-react";
 import { useApp } from "../lib/store";
+import { useLicense } from "../lib/license";
 import { isDevAuthenticated } from "../pages/Developer";
+import SyncIndicator from "./SyncIndicator";
+import PremiumActivationDialog from "./PremiumActivationDialog";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -47,6 +52,7 @@ export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { employees, settings } = useApp();
+  const { isPremium, license } = useLicense();
   const isDevPage = location.pathname === "/developer";
   const showDevLink = isDevAuthenticated();
 
@@ -54,6 +60,7 @@ export default function Layout() {
   const [showSearch, setShowSearch] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const premiumRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -110,7 +117,7 @@ export default function Layout() {
             <p className="text-[10px] text-slate-500 leading-tight">Restaurant Office Suite</p>
           </div>
         </div>
-        <p className="text-[10px] text-slate-400 px-3 mb-5">v1.0</p>
+        <p className="text-[10px] text-slate-400 px-3 mb-5">v2.0</p>
 
         <nav className="flex flex-col gap-0.5 flex-1">
           {navItems.map(({ to, icon: Icon, label }) => (
@@ -134,18 +141,25 @@ export default function Layout() {
 
         <div className="mt-4 space-y-2">
           <div className="relative" ref={premiumRef}>
-            <button onClick={() => setShowPremium(!showPremium)} className="w-full flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-amber-800 bg-amber-50 hover:bg-amber-100/80 transition-colors border border-amber-200/50">
-              <Star className="h-4 w-4 text-amber-500" />
-              Premium Features
-              <Lock className="h-3 w-3 ml-auto text-amber-400" />
+            <button
+              onClick={() => isPremium ? setShowPremium(!showPremium) : setShowPremiumDialog(true)}
+              className={`w-full flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border ${
+                isPremium
+                  ? "text-emerald-800 bg-emerald-50 border-emerald-200/50 hover:bg-emerald-100/80"
+                  : "text-amber-800 bg-amber-50 border-amber-200/50 hover:bg-amber-100/80"
+              }`}
+            >
+              {isPremium ? <Crown className="h-4 w-4 text-emerald-600" /> : <Star className="h-4 w-4 text-amber-500" />}
+              {isPremium ? "Premium Active" : "Premium Features"}
+              {isPremium ? <CheckCircle className="h-3 w-3 ml-auto text-emerald-500" /> : <Lock className="h-3 w-3 ml-auto text-amber-400" />}
             </button>
-            {showPremium && (
+            {showPremium && isPremium && (
               <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-slate-200 rounded-xl shadow-lg p-3 space-y-2 z-50">
-                <p className="text-xs font-semibold text-slate-500 mb-2 px-1">Premium Feature</p>
+                <p className="text-xs font-semibold text-emerald-600 mb-2 px-1">Premium Active</p>
                 {premiumFeatures.map((f) => (
-                  <div key={f.label} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                      <f.icon className="h-4 w-4 text-amber-600" />
+                  <div key={f.label} className="flex items-center gap-3 p-2.5 rounded-lg bg-emerald-50/50">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                      <CheckCircle className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div>
                       <p className="text-xs font-medium text-slate-800">{f.label}</p>
@@ -153,7 +167,11 @@ export default function Layout() {
                     </div>
                   </div>
                 ))}
-                <p className="text-[10px] text-slate-400 border-t border-slate-100 pt-2 px-1">Contact your developer to activate your license.</p>
+                {license.expiresAt && (
+                  <p className="text-[10px] text-slate-400 border-t border-slate-100 pt-2 px-1">
+                    Expires: {new Date(license.expiresAt).toLocaleDateString()}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -227,47 +245,51 @@ export default function Layout() {
             )}
           </div>
 
-          <div className="relative" ref={profileRef}>
-            <button
-              onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-3 py-1.5 transition-colors"
-            >
-              <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold">
-                {settings.ownerName.split(" ").map((n) => n[0]).join("")}
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-medium text-slate-800 leading-tight">{settings.ownerName}</p>
-                <p className="text-xs text-slate-500">Administrator</p>
-              </div>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
-            </button>
-            {showProfile && (
-              <div className="absolute top-full right-0 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
-                <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                  <p className="text-sm font-medium text-slate-800">{settings.ownerName}</p>
-                  <p className="text-xs text-slate-500">{settings.ownerEmail}</p>
+          <div className="flex items-center gap-3">
+            <SyncIndicator />
+
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-3 py-1.5 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold">
+                  {settings.ownerName.split(" ").map((n) => n[0]).join("")}
                 </div>
-                <button
-                  onClick={() => { navigate("/settings"); setShowProfile(false); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  <User className="h-4 w-4 text-slate-400" /> Profile
-                </button>
-                <button
-                  onClick={() => { navigate("/settings"); setShowProfile(false); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  <Settings className="h-4 w-4 text-slate-400" /> Change Password
-                </button>
-                <hr className="border-slate-100 my-1" />
-                <button
-                  onClick={() => { localStorage.clear(); window.location.reload(); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <LogOut className="h-4 w-4" /> Logout
-                </button>
-              </div>
-            )}
+                <div className="text-left">
+                  <p className="text-sm font-medium text-slate-800 leading-tight">{settings.ownerName}</p>
+                  <p className="text-xs text-slate-500">{isPremium ? "Premium" : "Basic"} Account</p>
+                </div>
+                <ChevronDown className="h-4 w-4 text-slate-400" />
+              </button>
+              {showProfile && (
+                <div className="absolute top-full right-0 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                    <p className="text-sm font-medium text-slate-800">{settings.ownerName}</p>
+                    <p className="text-xs text-slate-500">{settings.ownerEmail}</p>
+                  </div>
+                  <button
+                    onClick={() => { navigate("/settings"); setShowProfile(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <User className="h-4 w-4 text-slate-400" /> Profile
+                  </button>
+                  <button
+                    onClick={() => { navigate("/settings"); setShowProfile(false); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <Settings className="h-4 w-4 text-slate-400" /> Change Password
+                  </button>
+                  <hr className="border-slate-100 my-1" />
+                  <button
+                    onClick={() => { localStorage.clear(); window.location.reload(); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -275,6 +297,8 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+
+      <PremiumActivationDialog open={showPremiumDialog} onClose={() => setShowPremiumDialog(false)} />
     </div>
   );
 }

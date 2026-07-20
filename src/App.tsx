@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "./lib/store";
+import { LicenseProvider } from "./lib/license";
+import ToastContainer from "./components/Toast";
+import { startSyncWorker, stopSyncWorker } from "./services/sync.service";
+import { useEffect } from "react";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
@@ -14,27 +18,41 @@ import AuditLogs from "./pages/AuditLogs";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 
+function AppInner() {
+  useEffect(() => {
+    startSyncWorker();
+    return () => stopSyncWorker();
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="employees" element={<Employees />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="salaries" element={<Salaries />} />
+          <Route path="leaves" element={<Leaves />} />
+          <Route path="departments" element={<Departments />} />
+          <Route path="expenses" element={<Expenses />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="audit-logs" element={<AuditLogs />} />
+          <Route path="developer" element={<Developer />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
 function App() {
   return (
     <AppProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="employees" element={<Employees />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="salaries" element={<Salaries />} />
-            <Route path="leaves" element={<Leaves />} />
-            <Route path="departments" element={<Departments />} />
-            <Route path="expenses" element={<Expenses />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="audit-logs" element={<AuditLogs />} />
-            <Route path="developer" element={<Developer />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <LicenseProvider>
+        <AppInner />
+        <ToastContainer />
+      </LicenseProvider>
     </AppProvider>
   );
 }

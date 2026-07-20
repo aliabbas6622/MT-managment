@@ -1,0 +1,361 @@
+Switch to Developer Mode.
+
+Your objective is to transform this application into a production-ready commercial desktop application suitable for selling to restaurants.
+
+==================================================
+GENERAL REQUIREMENTS
+==================================================
+
+- Follow clean architecture.
+- Use Electron + React + TypeScript.
+- Use strict TypeScript.
+- Keep the code modular.
+- No duplicated business logic.
+- No hardcoded values.
+- Maintain existing functionality.
+- Production quality only.
+- Add comments only where necessary.
+- Keep components reusable.
+
+Launch multiple agents where appropriate to work on different modules simultaneously.
+
+==================================================
+DATABASE
+==================================================
+
+Replace the local-only architecture with PostgreSQL using Neon.
+
+Use environment variables.
+
+Example:
+
+DATABASE_URL=<read from environment>
+
+Never hardcode database credentials.
+
+Use Prisma ORM.
+
+Create proper migrations.
+
+Create indexes.
+
+Create constraints.
+
+Use transactions where appropriate.
+
+Normalize the schema.
+
+Tables should include at minimum:
+
+- employees
+- attendance
+- salaries
+- leaves
+- departments
+- expenses
+- reports
+- users
+- licenses
+- audit_logs
+- settings
+- sync_queue
+
+Implement:
+
+- optimistic concurrency where needed
+- proper foreign keys
+- cascading rules where appropriate
+- created_at
+- updated_at
+- deleted_at (soft delete where appropriate)
+
+==================================================
+OFFLINE FIRST
+==================================================
+
+The application must continue working even without internet.
+
+Requirements:
+
+- Local SQLite database
+- Neon PostgreSQL as cloud database
+- Background synchronization
+
+Workflow:
+
+User edits data
+
+↓
+
+Save immediately to SQLite
+
+↓
+
+Insert into sync_queue
+
+↓
+
+Background worker syncs to Neon
+
+↓
+
+Mark sync completed
+
+The UI must never freeze while syncing.
+
+==================================================
+SYNC ENGINE
+==================================================
+
+Create a professional synchronization engine.
+
+Requirements:
+
+- Detect internet connectivity
+- Automatic retry
+- Exponential backoff
+- Batch uploads
+- Batch downloads
+- Conflict resolution
+- Queue processing
+- Background worker
+- Sync indicator in UI
+
+Avoid excessive requests.
+
+Use a configurable sync interval.
+
+Example:
+
+30–60 seconds
+
+or immediate sync after important changes.
+
+Never spam the database.
+
+==================================================
+PREMIUM LICENSING
+==================================================
+
+This application has two editions:
+
+Basic
+
+Premium
+
+Premium code must already exist.
+
+Do NOT remove Premium features.
+
+Premium features remain locked.
+
+When user clicks
+
+Premium Features
+
+show a modern dialog.
+
+Dialog contains:
+
+Title
+
+Premium Activation
+
+Description
+
+Enter your activation token.
+
+Input
+
+Activation Token
+
+Buttons
+
+Activate
+
+Cancel
+
+==================================================
+LICENSE VALIDATION
+==================================================
+
+Activation works using a secure activation token.
+
+Flow:
+
+User enters token
+
+↓
+
+Send securely to backend
+
+↓
+
+Backend validates token
+
+↓
+
+If valid:
+
+Store encrypted license locally
+
+Enable Premium features
+
+Update UI immediately
+
+If invalid:
+
+Show friendly error
+
+Never hardcode tokens.
+
+Never validate only on the client.
+
+Design the licensing system so it can support:
+
+- expiration
+- perpetual licenses
+- disabled licenses
+- future subscription model
+
+==================================================
+PREMIUM FEATURES
+==================================================
+
+Implement Premium modules.
+
+Examples:
+
+Analytics
+
+Advanced Reports
+
+Cloud Backup
+
+Cloud Sync
+
+Expense Analytics
+
+Audit Logs
+
+Role Management
+
+Notification Center
+
+Multi-user support
+
+Automatic Payroll
+
+Data Export
+
+Advanced Dashboard
+
+Premium modules should appear in the sidebar with a lock icon until activated.
+
+==================================================
+SECURITY
+==================================================
+
+Never expose secrets.
+
+Never expose database credentials.
+
+Use environment variables.
+
+Encrypt sensitive local data.
+
+Validate all inputs.
+
+Prevent SQL injection.
+
+Implement rate limiting where appropriate.
+
+Never trust client input.
+
+==================================================
+USER EXPERIENCE
+==================================================
+
+Add:
+
+Loading states
+
+Empty states
+
+Error states
+
+Toast notifications
+
+Sync status indicator
+
+Online / Offline indicator
+
+License status indicator
+
+Professional dialogs
+
+Confirmation dialogs
+
+==================================================
+PERFORMANCE
+==================================================
+
+Lazy load pages.
+
+Virtualize large tables.
+
+Optimize Prisma queries.
+
+Batch database operations.
+
+Prevent unnecessary re-renders.
+
+Keep startup fast.
+
+==================================================
+CODE QUALITY
+==================================================
+
+Create reusable services.
+
+Separate:
+
+UI
+
+Business Logic
+
+Database
+
+Sync
+
+Licensing
+
+Authentication
+
+Utilities
+
+Never mix responsibilities.
+
+==================================================
+TASK MANAGEMENT
+==================================================
+
+Update TODO.md after every completed task.
+
+Mark completed tasks.
+
+Add newly discovered tasks.
+
+Do not stop until every module is production-ready.
+
+Continuously refactor where beneficial while preserving functionality.
+
+
+
+
+
+
+
+.env values:DATABASE_URL="postgresql://neondb_owner:npg_eqkps3Hg4tEI@ep-rough-lab-az9xn1ng-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+# uncomment next line if you use Prisma <5.10
+# DATABASE_URL_UNPOOLED="postgresql://neondb_owner:npg_eqkps3Hg4tEI@ep-rough-lab-az9xn1ng.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
