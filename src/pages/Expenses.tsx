@@ -28,64 +28,54 @@ export default function Expenses() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validate()) return;
-    if (editingId) {
-      updateExpense(editingId, form);
-    } else {
-      addExpense(form);
-    }
-    setShowForm(false);
-  };
+  const handleSubmit = () => { if (!validate()) return; if (editingId) updateExpense(editingId, form); else addExpense(form); setShowForm(false); };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Expenses</h1>
-        <button onClick={openAdd} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
+        <h1 className="text-2xl font-bold text-slate-900">Expenses</h1>
+        <button onClick={openAdd} className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors shadow-sm">
           <Plus className="h-4 w-4" /> Add Expense
         </button>
       </div>
 
       <div className="flex gap-2 items-center flex-wrap">
         {["all", ...categories].map((c) => (
-          <button key={c} onClick={() => setFilterCategory(c)} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterCategory === c ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+          <button key={c} onClick={() => setFilterCategory(c)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterCategory === c ? "bg-emerald-500 text-white" : "bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:text-emerald-700"}`}>
             {c === "all" ? "All" : c}
           </button>
         ))}
       </div>
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
-        <span className="text-sm text-muted-foreground">Total ({filterCategory === "all" ? "All" : filterCategory}):</span>
-        <span className="text-xl font-extrabold">{formatCurrency(totalFiltered)}</span>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+        <span className="text-sm text-slate-500">Total ({filterCategory === "all" ? "All" : filterCategory}):</span>
+        <span className="text-xl font-extrabold text-slate-900">{formatCurrency(totalFiltered)}</span>
       </div>
 
-      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="text-left p-3 font-medium">Category</th>
-              <th className="text-left p-3 font-medium">Amount</th>
-              <th className="text-left p-3 font-medium">Description</th>
-              <th className="text-left p-3 font-medium">Date</th>
-              <th className="text-right p-3 font-medium">Actions</th>
+            <tr className="border-b border-slate-100 bg-slate-50/50">
+              <th className="text-left p-3 font-medium text-slate-500">Category</th>
+              <th className="text-left p-3 font-medium text-slate-500">Amount</th>
+              <th className="text-left p-3 font-medium text-slate-500">Description</th>
+              <th className="text-left p-3 font-medium text-slate-500">Date</th>
+              <th className="text-right p-3 font-medium text-slate-500">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No expenses found.</td></tr>
+              <tr><td colSpan={5} className="p-6 text-center text-slate-400">No expenses found.</td></tr>
             ) : (
               filtered.map((exp) => (
-                <tr key={exp.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="p-3">
-                    <span className="bg-muted px-2 py-1 rounded text-xs font-medium">{exp.category}</span>
-                  </td>
-                  <td className="p-3 font-bold">{formatCurrency(exp.amount)}</td>
-                  <td className="p-3 text-muted-foreground">{exp.description}</td>
-                  <td className="p-3 text-muted-foreground">{exp.date}</td>
+                <tr key={exp.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
+                  <td className="p-3"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-xs font-medium">{exp.category}</span></td>
+                  <td className="p-3 font-bold text-slate-800">{formatCurrency(exp.amount)}</td>
+                  <td className="p-3 text-slate-500">{exp.description}</td>
+                  <td className="p-3 text-slate-500">{exp.date}</td>
                   <td className="p-3 text-right space-x-1">
-                    <button onClick={() => openEdit(exp)} className="p-1 hover:bg-muted rounded transition-colors"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => { if (confirm("Delete?")) deleteExpense(exp.id); }} className="p-1 hover:bg-muted rounded text-red-600 transition-colors"><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={() => openEdit(exp)} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"><Pencil className="h-4 w-4" /></button>
+                    <button onClick={() => { if (confirm("Delete?")) deleteExpense(exp.id); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
                   </td>
                 </tr>
               ))
@@ -95,33 +85,33 @@ export default function Expenses() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onKeyDown={(e) => e.key === "Escape" && setShowForm(false)}>
-          <div className="bg-background rounded-lg shadow-lg w-full max-w-md p-6 space-y-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50" onKeyDown={(e) => e.key === "Escape" && setShowForm(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 border border-slate-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{editingId ? "Edit Expense" : "Add Expense"}</h2>
-              <button onClick={() => setShowForm(false)} className="hover:bg-muted rounded p-1"><X className="h-5 w-5" /></button>
+              <h2 className="text-lg font-semibold text-slate-800">{editingId ? "Edit Expense" : "Add Expense"}</h2>
+              <button onClick={() => setShowForm(false)} className="hover:bg-slate-100 rounded-lg p-1.5 transition-colors"><X className="h-5 w-5 text-slate-400" /></button>
             </div>
             <div className="space-y-3">
               <div>
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm">
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400">
                   <option value="">Select Category</option>
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-                {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category}</p>}
+                {errors.category && <p className="text-xs text-rose-500 mt-1">{errors.category}</p>}
               </div>
               <div>
-                <input type="number" placeholder="Amount" value={form.amount || ""} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} className="w-full border rounded-md px-3 py-2 text-sm" />
-                {errors.amount && <p className="text-xs text-red-500 mt-1">{errors.amount}</p>}
+                <input type="number" placeholder="Amount" value={form.amount || ""} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400" />
+                {errors.amount && <p className="text-xs text-rose-500 mt-1">{errors.amount}</p>}
               </div>
-              <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" />
+              <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400" />
               <div>
-                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm" />
-                {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date}</p>}
+                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400" />
+                {errors.date && <p className="text-xs text-rose-500 mt-1">{errors.date}</p>}
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm border rounded-md hover:bg-muted transition-colors">Cancel</button>
-              <button onClick={handleSubmit} className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity">Save</button>
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-700">Cancel</button>
+              <button onClick={handleSubmit} className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium">Save</button>
             </div>
           </div>
         </div>

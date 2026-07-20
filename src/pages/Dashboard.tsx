@@ -26,7 +26,7 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ["#22c55e", "#ef4444", "#eab308", "#3b82f6"];
+const CHART_COLORS = ["#10b981", "#38bdf8", "#fbbf24", "#fb7185", "#94a3b8"];
 
 export default function Dashboard() {
   const { employees, attendance, leaves, expenses } = useApp();
@@ -39,17 +39,17 @@ export default function Dashboard() {
   const totalSalaries = employees.filter((e) => e.status === "active").reduce((sum, e) => sum + e.salary, 0);
 
   const stats = [
-    { label: "Total Employees", value: activeEmployees, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Present Today", value: presentToday, icon: Clock, color: "text-green-600", bg: "bg-green-50" },
-    { label: "On Leave", value: onLeave, icon: CalendarOff, color: "text-orange-600", bg: "bg-orange-50" },
-    { label: "Monthly Expenses", value: formatCurrency(totalExpenses), icon: DollarSign, color: "text-red-600", bg: "bg-red-50" },
+    { label: "Total Employees", value: activeEmployees, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "Present Today", value: presentToday, icon: Clock, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "On Leave", value: onLeave, icon: CalendarOff, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Monthly Expenses", value: formatCurrency(totalExpenses), icon: DollarSign, color: "text-rose-600", bg: "bg-rose-50" },
   ];
 
   const quickActions = [
-    { label: "Add Employee", icon: UserPlus, action: () => navigate("/employees"), color: "bg-blue-500 hover:bg-blue-600" },
-    { label: "Take Attendance", icon: Play, action: () => navigate("/attendance"), color: "bg-green-500 hover:bg-green-600" },
-    { label: "Generate Payroll", icon: DollarSign, action: () => navigate("/salaries"), color: "bg-purple-500 hover:bg-purple-600" },
-    { label: "Export Report", icon: FileDown, action: () => navigate("/reports"), color: "bg-orange-500 hover:bg-orange-600" },
+    { label: "Add Employee", icon: UserPlus, action: () => navigate("/employees"), primary: true },
+    { label: "Take Attendance", icon: Play, action: () => navigate("/attendance"), primary: false },
+    { label: "Generate Payroll", icon: DollarSign, action: () => navigate("/salaries"), primary: false },
+    { label: "Export Report", icon: FileDown, action: () => navigate("/reports"), primary: false },
   ];
 
   const attendanceData = [
@@ -70,18 +70,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-default group">
+          <div key={s.label} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow cursor-default group">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">{s.label}</p>
+              <p className="text-sm text-slate-500">{s.label}</p>
               <div className={`${s.bg} ${s.color} rounded-lg p-2.5 group-hover:scale-110 transition-transform`}>
                 <s.icon className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-4xl font-extrabold mt-3 tracking-tight">{s.value}</p>
+            <p className="text-4xl font-extrabold mt-3 tracking-tight text-slate-900">{s.value}</p>
           </div>
         ))}
       </div>
@@ -91,7 +91,11 @@ export default function Dashboard() {
           <button
             key={a.label}
             onClick={a.action}
-            className={`${a.color} text-white rounded-lg px-4 py-3 flex items-center gap-2 text-sm font-medium transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.98]`}
+            className={`rounded-xl px-4 py-3 flex items-center gap-2.5 text-sm font-medium transition-all hover:shadow-md active:scale-[0.98] ${
+              a.primary
+                ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-300 hover:text-emerald-700"
+            }`}
           >
             <a.icon className="h-4 w-4" />
             {a.label}
@@ -100,29 +104,30 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-muted-foreground" />
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-slate-400" />
             Attendance Overview
           </h2>
           {attendanceData.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-8">No attendance data yet.</p>
+            <p className="text-slate-400 text-sm text-center py-8">No attendance data yet.</p>
           ) : (
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={220}>
               <BarChart data={attendanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" fontSize={12} />
-                <YAxis fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" fontSize={12} tick={{ fill: "#64748b" }} />
+                <YAxis fontSize={12} tick={{ fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
                 />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                   {attendanceData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -130,16 +135,16 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <TrendingDown className="h-5 w-5 text-muted-foreground" />
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <TrendingDown className="h-5 w-5 text-slate-400" />
             Expenses by Category
           </h2>
           {expenseChartData.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-8">No expense data yet.</p>
+            <p className="text-slate-400 text-sm text-center py-8">No expense data yet.</p>
           ) : (
             <div className="flex items-center gap-6">
-              <ResponsiveContainer width="50%" height={200}>
+              <ResponsiveContainer width="50%" height={220}>
                 <PieChart>
                   <Pie
                     data={expenseChartData}
@@ -147,33 +152,35 @@ export default function Dashboard() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={70}
+                    outerRadius={75}
+                    innerRadius={40}
                     label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     labelLine={false}
                     fontSize={10}
                   >
                     {expenseChartData.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip
                     formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                     }}
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-2.5">
                 {expenseChartData.map((d, i) => (
                   <div key={d.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                      <span>{d.name}</span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                      <span className="text-slate-600">{d.name}</span>
                     </div>
-                    <span className="font-medium">{formatCurrency(d.amount)}</span>
+                    <span className="font-medium text-slate-800">{formatCurrency(d.amount)}</span>
                   </div>
                 ))}
               </div>
@@ -183,23 +190,23 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Today's Attendance</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Today's Attendance</h2>
           {recentAttendance.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No attendance records today.</p>
+            <p className="text-slate-400 text-sm">No attendance records today.</p>
           ) : (
             <div className="space-y-3">
               {recentAttendance.map((a) => (
-                <div key={a.id} className="flex items-center justify-between border-b pb-2 last:border-0">
+                <div key={a.id} className="flex items-center justify-between border-b border-slate-100 pb-2.5 last:border-0">
                   <div>
-                    <p className="font-medium text-sm">{a.employeeName}</p>
-                    <p className="text-xs text-muted-foreground">Check in: {a.checkIn || "\u2014"}</p>
+                    <p className="font-medium text-sm text-slate-800">{a.employeeName}</p>
+                    <p className="text-xs text-slate-500">Check in: {a.checkIn || "\u2014"}</p>
                   </div>
                   <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${
-                    a.status === "present" ? "bg-green-100 text-green-700" :
-                    a.status === "late" ? "bg-yellow-100 text-yellow-700" :
-                    a.status === "absent" ? "bg-red-100 text-red-700" :
-                    "bg-blue-100 text-blue-700"
+                    a.status === "present" ? "bg-emerald-50 text-emerald-700" :
+                    a.status === "late" ? "bg-amber-50 text-amber-700" :
+                    a.status === "absent" ? "bg-rose-50 text-rose-700" :
+                    "bg-sky-50 text-sky-700"
                   }`}>
                     {formatStatus(a.status)}
                   </span>
@@ -209,19 +216,19 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Pending Leave Requests</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Pending Leave Requests</h2>
           {recentLeaves.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No pending leave requests.</p>
+            <p className="text-slate-400 text-sm">No pending leave requests.</p>
           ) : (
             <div className="space-y-3">
               {recentLeaves.map((l) => (
-                <div key={l.id} className="flex items-center justify-between border-b pb-2 last:border-0">
+                <div key={l.id} className="flex items-center justify-between border-b border-slate-100 pb-2.5 last:border-0">
                   <div>
-                    <p className="font-medium text-sm">{l.employeeName}</p>
-                    <p className="text-xs text-muted-foreground">{l.startDate} to {l.endDate}</p>
+                    <p className="font-medium text-sm text-slate-800">{l.employeeName}</p>
+                    <p className="text-xs text-slate-500">{l.startDate} to {l.endDate}</p>
                   </div>
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700 capitalize">
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 capitalize">
                     {formatStatus(l.type)}
                   </span>
                 </div>
@@ -231,34 +238,34 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">Financial Summary</h2>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">Financial Summary</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
-            <div className="bg-green-50 text-green-600 rounded-lg p-2.5">
+            <div className="bg-emerald-50 text-emerald-600 rounded-xl p-2.5">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Salaries</p>
-              <p className="font-bold text-lg">{formatCurrency(totalSalaries)}</p>
+              <p className="text-sm text-slate-500">Total Salaries</p>
+              <p className="font-bold text-lg text-slate-800">{formatCurrency(totalSalaries)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-red-50 text-red-600 rounded-lg p-2.5">
+            <div className="bg-rose-50 text-rose-600 rounded-xl p-2.5">
               <TrendingDown className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Expenses</p>
-              <p className="font-bold text-lg">{formatCurrency(totalExpenses)}</p>
+              <p className="text-sm text-slate-500">Total Expenses</p>
+              <p className="font-bold text-lg text-slate-800">{formatCurrency(totalExpenses)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-blue-50 text-blue-600 rounded-lg p-2.5">
+            <div className="bg-slate-100 text-slate-600 rounded-xl p-2.5">
               <DollarSign className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Outflow</p>
-              <p className="font-bold text-lg">{formatCurrency(totalSalaries + totalExpenses)}</p>
+              <p className="text-sm text-slate-500">Total Outflow</p>
+              <p className="font-bold text-lg text-slate-800">{formatCurrency(totalSalaries + totalExpenses)}</p>
             </div>
           </div>
         </div>

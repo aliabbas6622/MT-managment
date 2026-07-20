@@ -24,57 +24,25 @@ export default function Developer() {
 
   useEffect(() => {
     const raw = localStorage.getItem("malir-tonight-data");
-    if (raw) {
-      const bytes = new Blob([raw]).size;
-      setDbSize(`${(bytes / 1024).toFixed(1)} KB`);
-    }
+    if (raw) setDbSize(`${(new Blob([raw]).size / 1024).toFixed(1)} KB`);
   }, []);
 
-  const handleLogin = () => {
-    if (password === DEV_PASSWORD) {
-      setDevAuth(true);
-      setAuthenticated(true);
-    } else {
-      alert("Invalid developer password");
-    }
-  };
-
-  const handleClearAll = () => {
-    if (confirm("WARNING: This will delete ALL data. Are you sure?")) {
-      localStorage.removeItem("malir-tonight-data");
-      localStorage.removeItem(DEV_KEY);
-      window.location.reload();
-    }
-  };
-
-  const handleExportData = () => {
-    const data = localStorage.getItem("malir-tonight-data");
-    if (!data) return;
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleSeedDemo = () => {
-    localStorage.removeItem("malir-tonight-data");
-    window.location.reload();
-  };
+  const handleLogin = () => { if (password === DEV_PASSWORD) { setDevAuth(true); setAuthenticated(true); } else alert("Invalid developer password"); };
+  const handleClearAll = () => { if (confirm("WARNING: This will delete ALL data. Are you sure?")) { localStorage.removeItem("malir-tonight-data"); localStorage.removeItem(DEV_KEY); window.location.reload(); } };
+  const handleExportData = () => { const data = localStorage.getItem("malir-tonight-data"); if (!data) return; const blob = new Blob([data], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`; a.click(); URL.revokeObjectURL(url); };
+  const handleSeedDemo = () => { localStorage.removeItem("malir-tonight-data"); window.location.reload(); };
 
   if (!authenticated) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="rounded-lg border bg-card p-8 shadow-sm w-full max-w-sm space-y-4 text-center">
-          <Terminal className="h-12 w-12 mx-auto text-muted-foreground" />
-          <h1 className="text-xl font-bold">Developer Access</h1>
-          <p className="text-sm text-muted-foreground">Enter the developer password to continue.</p>
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleLogin()} className="w-full border rounded-md px-3 py-2 text-sm" />
-          <button onClick={handleLogin} className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
-            Authenticate
-          </button>
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm w-full max-w-sm space-y-4 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto">
+            <Terminal className="h-8 w-8 text-slate-500" />
+          </div>
+          <h1 className="text-xl font-bold text-slate-900">Developer Access</h1>
+          <p className="text-sm text-slate-500">Enter the developer password to continue.</p>
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleLogin()} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400" />
+          <button onClick={handleLogin} className="w-full bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors">Authenticate</button>
         </div>
       </div>
     );
@@ -85,14 +53,18 @@ export default function Developer() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Terminal className="h-6 w-6 text-purple-600" />
-        <h1 className="text-2xl font-bold">Developer Console</h1>
-        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">DEV</span>
+        <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+          <Terminal className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Developer Console</h1>
+          <p className="text-xs text-slate-500">System diagnostics and data management</p>
+        </div>
       </div>
 
       <div className="flex gap-2">
         {tabs.map((t) => (
-          <button key={t} onClick={() => setActiveTab(t)} className={`px-3 py-1.5 rounded-md text-sm font-medium ${activeTab === t ? "bg-purple-600 text-white" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+          <button key={t} onClick={() => setActiveTab(t)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === t ? "bg-slate-800 text-white" : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300"}`}>
             {t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
@@ -101,17 +73,17 @@ export default function Developer() {
       {activeTab === "overview" && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { label: "Employees", value: employees.length, icon: Users, color: "text-blue-600" },
-            { label: "Attendance", value: attendance.length, icon: Clock, color: "text-green-600" },
-            { label: "Leaves", value: leaves.length, icon: CalendarOff, color: "text-orange-600" },
-            { label: "Departments", value: departments.length, icon: Database, color: "text-purple-600" },
-            { label: "Expenses", value: expenses.length, icon: DollarSign, color: "text-red-600" },
-            { label: "Audit Logs", value: auditLogs.length, icon: Terminal, color: "text-gray-600" },
+            { label: "Employees", value: employees.length, icon: Users },
+            { label: "Attendance", value: attendance.length, icon: Clock },
+            { label: "Leaves", value: leaves.length, icon: CalendarOff },
+            { label: "Departments", value: departments.length, icon: Database },
+            { label: "Expenses", value: expenses.length, icon: DollarSign },
+            { label: "Audit Logs", value: auditLogs.length, icon: Terminal },
           ].map((s) => (
-            <div key={s.label} className="rounded-lg border bg-card p-4 text-card-foreground shadow-sm text-center">
-              <s.icon className={`h-5 w-5 mx-auto mb-2 ${s.color}`} />
-              <p className="text-2xl font-bold">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
+            <div key={s.label} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm text-center hover:shadow-md transition-shadow">
+              <s.icon className="h-5 w-5 mx-auto mb-2 text-slate-400" />
+              <p className="text-2xl font-extrabold text-slate-900">{s.value}</p>
+              <p className="text-xs text-slate-500">{s.label}</p>
             </div>
           ))}
         </div>
@@ -119,23 +91,16 @@ export default function Developer() {
 
       {activeTab === "data" && (
         <div className="space-y-4">
-          <div className="rounded-lg border bg-card p-6 space-y-3">
-            <h3 className="font-semibold flex items-center gap-2"><Database className="h-4 w-4" /> Local Storage Data</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-3">
+            <h3 className="font-semibold text-slate-800 flex items-center gap-2"><Database className="h-4 w-4 text-slate-400" /> Local Storage Data</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-muted rounded p-3">
-                <p className="text-muted-foreground">Storage Size</p>
-                <p className="text-lg font-bold">{dbSize}</p>
-              </div>
-              <div className="bg-muted rounded p-3">
-                <p className="text-muted-foreground">Storage Key</p>
-                <p className="text-lg font-bold font-mono text-xs">malir-tonight-data</p>
-              </div>
+              <div className="bg-slate-50 rounded-xl p-4"><p className="text-slate-500 text-xs">Storage Size</p><p className="text-xl font-bold text-slate-900 mt-1">{dbSize}</p></div>
+              <div className="bg-slate-50 rounded-xl p-4"><p className="text-slate-500 text-xs">Storage Key</p><p className="text-sm font-bold font-mono text-slate-800 mt-1">malir-tonight-data</p></div>
             </div>
           </div>
-
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="font-semibold mb-3">Raw JSON Data</h3>
-            <pre className="bg-muted rounded p-4 text-xs overflow-auto max-h-96 font-mono">
+          <div className="rounded-xl border border-slate-200 bg-white p-6">
+            <h3 className="font-semibold text-slate-800 mb-3">Raw JSON Data</h3>
+            <pre className="bg-slate-50 rounded-xl p-4 text-xs overflow-auto max-h-96 font-mono text-slate-700">
               {JSON.stringify({ employees, attendance, leaves, departments, expenses, auditLogs }, null, 2)}
             </pre>
           </div>
@@ -144,36 +109,22 @@ export default function Developer() {
 
       {activeTab === "debug" && (
         <div className="space-y-4">
-          <div className="rounded-lg border bg-card p-6 space-y-3">
-            <h3 className="font-semibold">Environment Info</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-3">
+            <h3 className="font-semibold text-slate-800">Environment Info</h3>
             <table className="w-full text-sm">
               <tbody>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">Platform</td><td className="p-2 font-mono">{navigator.platform}</td></tr>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">User Agent</td><td className="p-2 font-mono text-xs break-all">{navigator.userAgent}</td></tr>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">Language</td><td className="p-2 font-mono">{navigator.language}</td></tr>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">Online</td><td className="p-2 font-mono">{navigator.onLine ? "Yes" : "No"}</td></tr>
-                <tr><td className="p-2 text-muted-foreground">Screen</td><td className="p-2 font-mono">{window.screen.width}x{window.screen.height}</td></tr>
+                {[["Platform", navigator.platform], ["Language", navigator.language], ["Online", navigator.onLine ? "Yes" : "No"], ["Screen", `${window.screen.width}x${window.screen.height}`]].map(([k, v]) => (
+                  <tr key={String(k)} className="border-b border-slate-100 last:border-0"><td className="p-2 text-slate-500">{k}</td><td className="p-2 font-mono text-slate-700">{v}</td></tr>
+                ))}
               </tbody>
             </table>
           </div>
-
-          <div className="rounded-lg border bg-card p-6 space-y-3">
-            <h3 className="font-semibold">React State</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-3">
+            <h3 className="font-semibold text-slate-800">React State</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">employees:</span> <span className="font-mono">{employees.length} items</span></div>
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">attendance:</span> <span className="font-mono">{attendance.length} items</span></div>
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">leaves:</span> <span className="font-mono">{leaves.length} items</span></div>
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">departments:</span> <span className="font-mono">{departments.length} items</span></div>
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">expenses:</span> <span className="font-mono">{expenses.length} items</span></div>
-              <div className="bg-muted rounded p-2"><span className="text-muted-foreground">auditLogs:</span> <span className="font-mono">{auditLogs.length} items</span></div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-card p-6 space-y-3">
-            <h3 className="font-semibold">Console Actions</h3>
-            <div className="flex gap-2">
-              <button onClick={() => console.log("State:", { employees, attendance, leaves, departments, expenses, auditLogs })} className="px-3 py-1.5 bg-muted rounded text-sm hover:bg-muted/80">Log State to Console</button>
-              <button onClick={() => console.clear()} className="px-3 py-1.5 bg-muted rounded text-sm hover:bg-muted/80">Clear Console</button>
+              {[["employees", employees.length], ["attendance", attendance.length], ["leaves", leaves.length], ["departments", departments.length], ["expenses", expenses.length], ["auditLogs", auditLogs.length]].map(([k, v]) => (
+                <div key={String(k)} className="bg-slate-50 rounded-lg p-2.5"><span className="text-slate-500">{k}: </span><span className="font-mono text-slate-700">{v} items</span></div>
+              ))}
             </div>
           </div>
         </div>
@@ -181,35 +132,29 @@ export default function Developer() {
 
       {activeTab === "actions" && (
         <div className="space-y-4">
-          <div className="rounded-lg border bg-card p-6 space-y-4">
-            <h3 className="font-semibold">Data Management</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+            <h3 className="font-semibold text-slate-800">Data Management</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <button onClick={handleExportData} className="flex items-center justify-center gap-2 border rounded-md px-4 py-3 text-sm font-medium hover:bg-muted">
+              <button onClick={handleExportData} className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium hover:bg-slate-50 transition-colors text-slate-700">
                 <Download className="h-4 w-4" /> Export Backup
               </button>
-              <button onClick={handleSeedDemo} className="flex items-center justify-center gap-2 border rounded-md px-4 py-3 text-sm font-medium hover:bg-muted">
+              <button onClick={handleSeedDemo} className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium hover:bg-slate-50 transition-colors text-slate-700">
                 <RefreshCw className="h-4 w-4" /> Reset to Demo Data
               </button>
-              <button onClick={handleClearAll} className="flex items-center justify-center gap-2 border border-red-300 text-red-600 rounded-md px-4 py-3 text-sm font-medium hover:bg-red-50">
+              <button onClick={handleClearAll} className="flex items-center justify-center gap-2 border border-rose-200 text-rose-600 rounded-xl px-4 py-3 text-sm font-medium hover:bg-rose-50 transition-colors">
                 <Trash2 className="h-4 w-4" /> Clear All Data
               </button>
             </div>
           </div>
-
-          <div className="rounded-lg border bg-card p-6 space-y-3">
-            <h3 className="font-semibold">App Info</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-6">
+            <h3 className="font-semibold text-slate-800 mb-3">App Info</h3>
             <table className="w-full text-sm">
               <tbody>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">App Name</td><td className="p-2">Malir Tonight</td></tr>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">Version</td><td className="p-2">1.0.0-dev</td></tr>
-                <tr className="border-b"><td className="p-2 text-muted-foreground">Stack</td><td className="p-2">Electron + React + TypeScript + Vite + Tailwind + Prisma + SQLite</td></tr>
-                <tr><td className="p-2 text-muted-foreground">License</td><td className="p-2">Basic / Premium</td></tr>
+                {[["App Name", "Malir Tonight"], ["Version", "1.0.0-dev"], ["Stack", "Electron + React + TypeScript + Vite + Tailwind + Prisma + SQLite"], ["License", "Basic / Premium"]].map(([k, v]) => (
+                  <tr key={k} className="border-b border-slate-100 last:border-0"><td className="p-2 text-slate-500">{k}</td><td className="p-2 text-slate-800">{v}</td></tr>
+                ))}
               </tbody>
             </table>
-          </div>
-
-          <div className="rounded-lg border border-dashed border-purple-300 bg-purple-50 p-4">
-            <p className="text-sm text-purple-700 font-medium">Developer page is hidden from the sidebar. Access it via the URL: <code className="bg-purple-100 px-1 rounded">/developer</code></p>
           </div>
         </div>
       )}
