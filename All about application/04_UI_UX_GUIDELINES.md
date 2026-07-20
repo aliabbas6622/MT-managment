@@ -1,10 +1,4 @@
 # UI/UX
 
-- Modern Material Design
-- Left sidebar navigation
-- Dashboard cards
-- Data tables with search/filter
-- Light/Dark theme support
-- Consistent spacing
-- Confirmation dialogs for destructive actions
-- Responsive window resizing
+Modern premium UI inspired by Linear, Notion, VS Code, Stripe.
+Dark theme, collapsible sidebar, dashboard cards, search, filters, smooth animations, locked premium modules.

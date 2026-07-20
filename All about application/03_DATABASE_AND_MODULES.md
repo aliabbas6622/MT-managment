@@ -1,22 +1,5 @@
 # Database
 
-Tables:
-- Employees
-- Attendance
-- Salaries
-- Leaves
-- Departments
-- Expenses
-- Users
-- Roles
-- AuditLogs
-- Settings
-- Licenses
+Tables: Employees, Attendance, Salaries, Leaves, Departments, Expenses, Users, Roles, Settings, Licenses, AuditLogs.
 
-Each module should contain:
-- Model
-- Repository
-- Service
-- ViewModel
-- View
-- Validation
+Every module: UI, Validation, Service, Database, Business Rules.

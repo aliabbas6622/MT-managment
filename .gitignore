@@ -1,31 +1,8 @@
-```
-# Visual Studio/Visual Studio Code files
-.vs/
-.vscode/
-
-# Compiled/build artifacts
-lib/main.dart.dill
-.dart_tool/
-build/
-dist/
-
-# Dependencies
-.pub/
-.venv/
-venv/
 node_modules/
-
-# Environment files
+dist/
+dist-electron/
+release/
+*.db
+*.db-journal
 .env
 .env.local
-*.env.*
-
-# Logs and temporary files
-*.log
-*.tmp
-*.swp
-
-# OS generated files
-.DS_Store
-Thumbs.db
-```

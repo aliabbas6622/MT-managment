@@ -1,20 +1,7 @@
 # Project Specification
 
-## Core Modules
-- Employee Management
-- Attendance
-- Salary & Payroll
-- Leave Management
-- Departments
-- Expenses
-- Reports
-- Settings
-- Audit Logs
+Modules: Dashboard, Employees, Attendance, Salaries, Leave, Departments, Expenses, Reports, Settings, Audit Logs, Licensing.
 
-## Basic
-Employee, Attendance, Leave, Manual Salary, Reports, Backup.
+Basic: Employee, Attendance, Leave, Manual Payroll, Reports.
 
-## Premium
-Automatic payroll, analytics, expenses, audit logs, notifications, advanced reports, multi-user permissions.
-
-Premium features exist in the codebase but remain disabled unless enabled by the developer's license.
+Premium: Auto Payroll, Analytics, Expenses, Audit Logs, Notifications, Advanced Reports, Multi-user Roles.

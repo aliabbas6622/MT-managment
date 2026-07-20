@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Employee {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String?
+  position  String
+  department Int?
+  hireDate  DateTime
+  salary    Float
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendance Attendance[]
+  leaves     Leave[]
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  employeeId Int
+  date      DateTime
+  checkIn   DateTime?
+  checkOut  DateTime?
+  status    String   @default("present")
+  notes     String?
+  createdAt DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Leave {
+  id        Int      @id @default(autoincrement())
+  employeeId Int
+  startDate DateTime
+  endDate   DateTime
+  type      String
+  status    String   @default("pending")
+  reason    String?
+  createdAt DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  category    String
+  amount      Float
+  description String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  entityId  Int?
+  details   String?
+  createdAt DateTime @default(now())
+}

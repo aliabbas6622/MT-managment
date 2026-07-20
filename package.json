@@ -1,0 +1,65 @@
+{
+  "name": "malir-tonight",
+  "version": "1.0.0",
+  "description": "Restaurant Office Suite - MT-management",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "electron:dev": "vite --config vite.config.ts",
+    "electron:build": "vite build && electron-builder",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliabbas6622/Malir-Tonight.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "@prisma/client": "^5.14.0",
+    "lucide-react": "^0.378.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0",
+    "class-variance-authority": "^0.7.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.6",
+    "electron-builder": "^24.13.3",
+    "vite": "^5.2.12",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.4.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.4",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19",
+    "@tailwindcss/typography": "^0.5.13",
+    "prisma": "^5.14.0"
+  },
+  "build": {
+    "appId": "com.malir-tonight.app",
+    "productName": "Malir Tonight",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
