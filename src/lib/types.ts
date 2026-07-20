@@ -9,6 +9,7 @@ export interface Employee {
   hireDate: string;
   salary: number;
   status: "active" | "inactive";
+  avatar?: string;
 }
 
 export interface AttendanceRecord {
