@@ -46,10 +46,10 @@ export default function AuditLogs() {
               <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No audit logs found.</td></tr>
             ) : (
               filtered.map((log) => (
-                <tr key={log.id} className="border-b last:border-0 hover:bg-muted/30">
+                <tr key={log.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="p-3 text-muted-foreground text-xs">{new Date(log.timestamp).toLocaleString()}</td>
                   <td className="p-3">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                       log.action === "CREATE" ? "bg-green-100 text-green-700" :
                       log.action === "UPDATE" ? "bg-blue-100 text-blue-700" :
                       "bg-red-100 text-red-700"
