@@ -37,6 +37,7 @@ function AppInner() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/developer" element={<Developer />} />
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="employees" element={<Employees />} />
@@ -49,7 +50,6 @@ function AppInner() {
           <Route path="settings" element={<Settings />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="users" element={<Users />} />
-          <Route path="developer" element={<Developer />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
