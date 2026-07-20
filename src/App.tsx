@@ -17,6 +17,7 @@ import Expenses from "./pages/Expenses";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import AuditLogs from "./pages/AuditLogs";
+import Users from "./pages/Users";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 
@@ -47,6 +48,7 @@ function AppInner() {
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
           <Route path="audit-logs" element={<AuditLogs />} />
+          <Route path="users" element={<Users />} />
           <Route path="developer" element={<Developer />} />
           <Route path="*" element={<NotFound />} />
         </Route>
