@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 type Role = "admin" | "manager" | "hr" | "viewer";
 
@@ -30,7 +30,6 @@ interface User {
   name: string;
   email: string;
   role: Role;
-  avatar?: string;
   createdAt: string;
 }
 
@@ -42,9 +41,10 @@ interface AuthContextType {
   hasPermission: (permission: Permission) => boolean;
   hasRole: (role: Role) => boolean;
   getUsers: () => User[];
-  addUser: (user: Omit<User, "id" | "createdAt"> & { password: string }) => void;
-  updateUser: (id: string, data: Partial<User>) => void;
-  deleteUser: (id: string) => void;
+  addUser: (data: { name: string; email: string; role: Role; password: string }) => { success: boolean; error?: string };
+  updateUser: (id: string, data: Partial<User>) => { success: boolean; error?: string };
+  deleteUser: (id: string) => { success: boolean; error?: string };
+  changePassword: (id: string, newPassword: string) => { success: boolean; error?: string };
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -98,9 +98,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
 
 const USERS_KEY = "malirTonight_users";
 const SESSION_KEY = "malirTonight_session";
-const HASH_SALT = "malirTonight_2026";
+const HASH_SALT = "mt_2026_salt";
 
-function simpleHash(password: string): string {
+function hashPassword(password: string): string {
   let hash = 0;
   const salted = HASH_SALT + password + HASH_SALT;
   for (let i = 0; i < salted.length; i++) {
@@ -115,15 +115,7 @@ function loadUsers(): User[] {
     const raw = localStorage.getItem(USERS_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return [
-    {
-      id: "usr_admin",
-      name: "Ali Abbas",
-      email: "admin@malir-tonight.com",
-      role: "admin",
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  return [];
 }
 
 function saveUsers(users: User[]): void {
@@ -151,7 +143,7 @@ function getPasswords(): Record<string, string> {
     const raw = localStorage.getItem("malirTonight_passwords");
     if (raw) return JSON.parse(raw);
   } catch {}
-  return { "admin@malir-tonight.com": simpleHash("admin123") };
+  return {};
 }
 
 function savePasswords(passwords: Record<string, string>): void {
@@ -161,20 +153,11 @@ function savePasswords(passwords: Record<string, string>): void {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(loadSession);
 
-  useEffect(() => {
-    if (!localStorage.getItem(USERS_KEY)) {
-      saveUsers(loadUsers());
-    }
-    if (!localStorage.getItem("malirTonight_passwords")) {
-      savePasswords(getPasswords());
-    }
-  }, []);
-
   const isAuthenticated = user !== null;
 
   const login = useCallback((email: string, password: string): { success: boolean; error?: string } => {
     const passwords = getPasswords();
-    const hashed = simpleHash(password);
+    const hashed = hashPassword(password);
 
     if (passwords[email] !== hashed) {
       return { success: false, error: "Invalid email or password." };
@@ -210,31 +193,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return loadUsers();
   }, []);
 
-  const addUser = useCallback((data: Omit<User, "id" | "createdAt"> & { password: string }) => {
+  const addUser = useCallback((data: { name: string; email: string; role: Role; password: string }): { success: boolean; error?: string } => {
     const users = loadUsers();
     const passwords = getPasswords();
 
+    if (!data.name.trim()) return { success: false, error: "Name is required." };
+    if (!data.email.trim()) return { success: false, error: "Email is required." };
+    if (!data.password.trim()) return { success: false, error: "Password is required." };
+    if (data.password.length < 4) return { success: false, error: "Password must be at least 4 characters." };
     if (users.some((u) => u.email === data.email)) {
-      return;
+      return { success: false, error: "A user with this email already exists." };
     }
 
     const newUser: User = {
-      id: `usr_${Date.now()}`,
-      name: data.name,
-      email: data.email,
+      id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: data.name.trim(),
+      email: data.email.trim(),
       role: data.role,
       createdAt: new Date().toISOString(),
     };
 
     users.push(newUser);
-    passwords[data.email] = simpleHash(data.password);
+    passwords[data.email] = hashPassword(data.password);
 
     saveUsers(users);
     savePasswords(passwords);
+    return { success: true };
   }, []);
 
-  const updateUser = useCallback((id: string, data: Partial<User>) => {
+  const updateUser = useCallback((id: string, data: Partial<User>): { success: boolean; error?: string } => {
     const users = loadUsers();
+    const target = users.find((u) => u.id === id);
+    if (!target) return { success: false, error: "User not found." };
+
+    if (data.email && data.email !== target.email) {
+      if (users.some((u) => u.email === data.email && u.id !== id)) {
+        return { success: false, error: "Email already in use." };
+      }
+    }
+
     const updated = users.map((u) => (u.id === id ? { ...u, ...data } : u));
     saveUsers(updated);
 
@@ -245,33 +242,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         saveSession(updatedUser);
       }
     }
+
+    return { success: true };
   }, [user]);
 
-  const deleteUser = useCallback((id: string) => {
+  const deleteUser = useCallback((id: string): { success: boolean; error?: string } => {
     const users = loadUsers();
     const passwords = getPasswords();
     const target = users.find((u) => u.id === id);
 
-    if (target && target.role === "admin") {
+    if (!target) return { success: false, error: "User not found." };
+    if (target.role === "admin") {
       const adminCount = users.filter((u) => u.role === "admin").length;
-      if (adminCount <= 1) return;
+      if (adminCount <= 1) return { success: false, error: "Cannot delete the last admin." };
     }
 
     const filtered = users.filter((u) => u.id !== id);
-    if (target) delete passwords[target.email];
+    delete passwords[target.email];
 
     saveUsers(filtered);
     savePasswords(passwords);
 
     if (user?.id === id) {
-      logout();
+      setUser(null);
+      saveSession(null);
     }
-  }, [user, logout]);
+
+    return { success: true };
+  }, [user]);
+
+  const changePassword = useCallback((id: string, newPassword: string): { success: boolean; error?: string } => {
+    if (newPassword.length < 4) return { success: false, error: "Password must be at least 4 characters." };
+
+    const users = loadUsers();
+    const target = users.find((u) => u.id === id);
+    if (!target) return { success: false, error: "User not found." };
+
+    const passwords = getPasswords();
+    passwords[target.email] = hashPassword(newPassword);
+    savePasswords(passwords);
+
+    return { success: true };
+  }, []);
 
   return (
     <AuthContext.Provider value={{
       user, isAuthenticated, login, logout, hasPermission, hasRole,
-      getUsers, addUser, updateUser, deleteUser,
+      getUsers, addUser, updateUser, deleteUser, changePassword,
     }}>
       {children}
     </AuthContext.Provider>

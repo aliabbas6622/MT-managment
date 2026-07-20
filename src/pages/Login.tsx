@@ -101,7 +101,7 @@ export default function Login() {
 
           <div className="mt-4 pt-4 border-t border-slate-100">
             <p className="text-[11px] text-slate-400 text-center">
-              Default: admin@malir-tonight.com / admin123
+              Ask your admin or developer for login credentials.
             </p>
           </div>
         </div>

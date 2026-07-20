@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users,
+  Users as UsersIcon,
   Clock,
   DollarSign,
   CalendarOff,
@@ -21,6 +21,7 @@ import {
   Lock,
   Crown,
   CheckCircle,
+  Shield,
 } from "lucide-react";
 import { useApp } from "../lib/store";
 import { useLicense } from "../lib/license";
@@ -30,7 +31,7 @@ import PremiumActivationDialog from "./PremiumActivationDialog";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/employees", icon: Users, label: "Employees" },
+  { to: "/employees", icon: UsersIcon, label: "Employees" },
   { to: "/attendance", icon: Clock, label: "Attendance" },
   { to: "/salaries", icon: DollarSign, label: "Salaries" },
   { to: "/leaves", icon: CalendarOff, label: "Leaves" },
@@ -52,7 +53,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const { employees, settings } = useApp();
   const { isPremium, license } = useLicense();
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const isDevPage = location.pathname === "/developer";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,6 +138,24 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+
+        {hasRole("admin") && (
+          <div className="mt-2">
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-emerald-50 text-emerald-800 border-l-[3px] border-emerald-500 ml-0"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`
+              }
+            >
+              <Shield className="h-4 w-4" />
+              Users
+            </NavLink>
+          </div>
+        )}
 
         <div className="mt-4 space-y-2">
           <div className="relative" ref={premiumRef}>
