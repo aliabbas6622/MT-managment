@@ -11,7 +11,6 @@ import {
   BarChart3,
   Settings,
   FileText,
-  Terminal,
   Search,
   Star,
   Cloud,
@@ -25,7 +24,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../lib/store";
 import { useLicense } from "../lib/license";
-import { isDevAuthenticated } from "../pages/Developer";
+import { useAuth } from "../lib/auth";
 import SyncIndicator from "./SyncIndicator";
 import PremiumActivationDialog from "./PremiumActivationDialog";
 
@@ -53,8 +52,8 @@ export default function Layout() {
   const navigate = useNavigate();
   const { employees, settings } = useApp();
   const { isPremium, license } = useLicense();
+  const { user, logout } = useAuth();
   const isDevPage = location.pathname === "/developer";
-  const showDevLink = isDevAuthenticated();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -176,21 +175,7 @@ export default function Layout() {
             )}
           </div>
 
-          {showDevLink && (
-            <NavLink
-              to="/developer"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-slate-800 text-white"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                }`
-              }
-            >
-              <Terminal className="h-4 w-4" />
-              Developer
-            </NavLink>
-          )}
+
         </div>
       </aside>
 
@@ -254,19 +239,19 @@ export default function Layout() {
                 className="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-3 py-1.5 transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold">
-                  {settings.ownerName.split(" ").map((n) => n[0]).join("")}
+                  {(user?.name || settings.ownerName).split(" ").map((n) => n[0]).join("")}
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-slate-800 leading-tight">{settings.ownerName}</p>
-                  <p className="text-xs text-slate-500">{isPremium ? "Premium" : "Basic"} Account</p>
+                  <p className="text-sm font-medium text-slate-800 leading-tight">{user?.name || settings.ownerName}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user?.role || "admin"} {isPremium ? "• Premium" : ""}</p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               </button>
               {showProfile && (
                 <div className="absolute top-full right-0 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                    <p className="text-sm font-medium text-slate-800">{settings.ownerName}</p>
-                    <p className="text-xs text-slate-500">{settings.ownerEmail}</p>
+                    <p className="text-sm font-medium text-slate-800">{user?.name || settings.ownerName}</p>
+                    <p className="text-xs text-slate-500">{user?.email || settings.ownerEmail}</p>
                   </div>
                   <button
                     onClick={() => { navigate("/settings"); setShowProfile(false); }}
@@ -282,7 +267,7 @@ export default function Layout() {
                   </button>
                   <hr className="border-slate-100 my-1" />
                   <button
-                    onClick={() => { localStorage.clear(); window.location.reload(); }}
+                    onClick={() => { logout(); navigate("/login"); }}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut className="h-4 w-4" /> Logout

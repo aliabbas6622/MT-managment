@@ -17,7 +17,7 @@ export default function PremiumActivationDialog({ open, onClose }: PremiumActiva
 
   if (!open) return null;
 
-  const handleActivate = () => {
+  const handleActivate = async () => {
     if (!token.trim()) {
       setError("Please enter an activation token.");
       return;
@@ -26,8 +26,8 @@ export default function PremiumActivationDialog({ open, onClose }: PremiumActiva
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      const result = activateLicense(token.trim());
+    try {
+      const result = await activateLicense(token.trim());
       setLoading(false);
 
       if (result.success) {
@@ -37,7 +37,10 @@ export default function PremiumActivationDialog({ open, onClose }: PremiumActiva
       } else {
         setError(result.error || "Activation failed. Please try again.");
       }
-    }, 800);
+    } catch {
+      setLoading(false);
+      setError("Activation failed. Please try again.");
+    }
   };
 
   return (
