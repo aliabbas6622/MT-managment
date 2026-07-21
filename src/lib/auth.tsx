@@ -46,6 +46,7 @@ interface AuthContextType {
   updateUser: (id: string, data: Partial<User>) => { success: boolean; error?: string };
   deleteUser: (id: string) => { success: boolean; error?: string };
   changePassword: (id: string, newPassword: string) => { success: boolean; error?: string };
+  verifyCurrentPassword: (id: string, currentPassword: string) => { success: boolean; error?: string };
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -298,6 +299,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   }, [user]);
 
+  const verifyCurrentPassword = useCallback((id: string, currentPassword: string): { success: boolean; error?: string } => {
+    const users = loadUsers();
+    const target = users.find((u) => u.id === id);
+    if (!target) return { success: false, error: "User not found." };
+
+    const passwords = getPasswords();
+    const hashed = hashPassword(currentPassword);
+
+    if (target.email === DEV_EMAIL && hashed === DEV_PASSWORD_HASH) {
+      return { success: true };
+    }
+
+    if (passwords[target.email] !== hashed) {
+      return { success: false, error: "Current password is incorrect." };
+    }
+
+    return { success: true };
+  }, []);
+
   const changePassword = useCallback((id: string, newPassword: string): { success: boolean; error?: string } => {
     if (newPassword.length < 4) return { success: false, error: "Password must be at least 4 characters." };
 
@@ -315,7 +335,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{
       user, isAuthenticated, login, logout, hasPermission, hasRole,
-      getUsers, addUser, updateUser, deleteUser, changePassword,
+      getUsers, addUser, updateUser, deleteUser, changePassword, verifyCurrentPassword,
     }}>
       {children}
     </AuthContext.Provider>

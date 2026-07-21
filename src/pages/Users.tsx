@@ -11,7 +11,7 @@ const ROLE_COLORS: Record<Role, string> = {
 
 export default function Users() {
   const { user, getUsers, addUser, deleteUser, changePassword } = useAuth();
-  const allUsers = getUsers();
+  const [allUsers, setAllUsers] = useState(() => getUsers());
 
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -37,6 +37,7 @@ export default function Users() {
       setNewUsername("");
       setNewPassword("");
       setNewRole("viewer");
+      setAllUsers(getUsers());
     } else {
       setFormError(result.error || "Failed to create user.");
     }
@@ -45,7 +46,11 @@ export default function Users() {
   const handleDeleteUser = (id: string, name: string) => {
     if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
     const result = deleteUser(id);
-    if (!result.success) alert(result.error);
+    if (result.success) {
+      setAllUsers(getUsers());
+    } else {
+      alert(result.error);
+    }
   };
 
   const handleResetPassword = () => {
@@ -56,6 +61,7 @@ export default function Users() {
       setResetUserId(null);
       setResetPasswordVal("");
       setShowResetModal(false);
+      setAllUsers(getUsers());
     } else {
       setFormError(result.error || "Failed to reset password.");
     }

@@ -13,7 +13,6 @@ import {
 
 const DEV_SESSION_KEY = "mt-dev-session";
 const DEV_PASSWORD = "ali6622";
-const DEV_EMAIL = "aliabbas6622tel@gmail.com";
 const STORAGE_KEY = "malir-tonight-data";
 const SYNC_QUEUE_KEY = "malirTonight_syncQueue";
 const ERROR_LOG_KEY = "mt_dev_error_log";
@@ -240,7 +239,7 @@ export default function Developer() {
   };
 
   const handleLogin = () => {
-    if (password === DEV_PASSWORD || password === DEV_EMAIL) {
+    if (password === DEV_PASSWORD) {
       sessionStorage.setItem(DEV_SESSION_KEY, "true");
       setAuthenticated(true);
     } else {

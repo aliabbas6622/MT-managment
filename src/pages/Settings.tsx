@@ -6,7 +6,7 @@ import { Settings as SettingsIcon, User, Bell, Palette, Shield } from "lucide-re
 
 export default function Settings() {
   const { settings, updateSettings } = useApp();
-  const { user, updateUser, changePassword } = useAuth();
+  const { user, updateUser, changePassword, verifyCurrentPassword } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("general");
   const [saved, setSaved] = useState(false);
@@ -58,6 +58,11 @@ export default function Settings() {
       return;
     }
     if (user) {
+      const verify = verifyCurrentPassword(user.id, currentPassword);
+      if (!verify.success) {
+        toast({ title: verify.error || "Current password is incorrect", variant: "error" });
+        return;
+      }
       const result = changePassword(user.id, newPassword);
       if (result.success) {
         toast({ title: "Password changed", variant: "success" });
