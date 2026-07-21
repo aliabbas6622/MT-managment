@@ -262,7 +262,7 @@ export default function Layout() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium text-slate-800 leading-tight">{user?.name || settings.ownerName}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.role || "admin"} {isPremium ? "• Premium" : ""}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user?.id === "usr_dev" ? "Developer" : user?.role || "admin"} {isPremium ? "• Premium" : ""}</p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               </button>
@@ -270,7 +270,7 @@ export default function Layout() {
                 <div className="absolute top-full right-0 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                     <p className="text-sm font-medium text-slate-800">{user?.name || settings.ownerName}</p>
-                    <p className="text-xs text-slate-500">{user?.email || settings.ownerEmail}</p>
+                    <p className="text-xs text-slate-500">{user?.id === "usr_dev" ? "Developer Access" : user?.email || settings.ownerEmail}</p>
                   </div>
                   <button
                     onClick={() => { navigate("/settings"); setShowProfile(false); }}

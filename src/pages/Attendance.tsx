@@ -16,8 +16,8 @@ export default function Attendance() {
   const openAdd = () => { setForm({ employeeId: 0, employeeName: "", date: new Date().toISOString().split("T")[0], checkIn: "", checkOut: "", status: "present", notes: "" }); setEditingId(null); setShowForm(true); };
   const openEdit = (rec: AttendanceRecord) => { setForm({ ...rec }); setEditingId(rec.id); setShowForm(true); };
   const handleEmployeeSelect = (id: number) => { const emp = employees.find((e) => e.id === id); if (emp) setForm({ ...form, employeeId: id, employeeName: `${emp.firstName} ${emp.lastName}` }); };
-  const handleSubmit = () => { if (!form.employeeId || !form.date) return; if (editingId) updateAttendance(editingId, form); else addAttendance(form); setShowForm(false); };
-  const handleCheckout = (id: number) => { const now = new Date(); updateAttendance(id, { checkOut: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` }); };
+  const handleSubmit = async () => { if (!form.employeeId || !form.date) return; if (editingId) await updateAttendance(editingId, form); else await addAttendance(form); setShowForm(false); };
+  const handleCheckout = async (id: number) => { const now = new Date(); await updateAttendance(id, { checkOut: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` }); };
 
   return (
     <div className="space-y-6">
@@ -72,7 +72,7 @@ export default function Attendance() {
                       </button>
                     )}
                     <button onClick={() => openEdit(rec)} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => { if (confirm("Delete?")) deleteAttendance(rec.id); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={async () => { if (confirm("Delete?")) await deleteAttendance(rec.id); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
                   </td>
                 </tr>
               ))

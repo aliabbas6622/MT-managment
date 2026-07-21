@@ -14,7 +14,7 @@ import type {
   Expense,
   AuditLog,
 } from "./types";
-import { addToSyncQueue } from "../services/sync.service";
+import { api } from "../services/api";
 
 interface AppSettings {
   restaurantName: string;
@@ -39,51 +39,32 @@ interface AppState {
   expenses: Expense[];
   auditLogs: AuditLog[];
   settings: AppSettings;
+  loading: boolean;
+  connected: boolean;
 }
 
 interface AppContextType extends AppState {
-  addEmployee: (e: Omit<Employee, "id">) => void;
-  updateEmployee: (id: number, e: Partial<Employee>) => void;
-  deleteEmployee: (id: number) => void;
-  addAttendance: (a: Omit<AttendanceRecord, "id">) => void;
-  updateAttendance: (id: number, a: Partial<AttendanceRecord>) => void;
-  deleteAttendance: (id: number) => void;
-  addLeave: (l: Omit<Leave, "id">) => void;
-  updateLeave: (id: number, l: Partial<Leave>) => void;
-  deleteLeave: (id: number) => void;
-  addDepartment: (d: Omit<Department, "id" | "employeeCount">) => void;
-  updateDepartment: (id: number, d: Partial<Department>) => void;
-  deleteDepartment: (id: number) => boolean;
-  addExpense: (e: Omit<Expense, "id">) => void;
-  updateExpense: (id: number, e: Partial<Expense>) => void;
-  deleteExpense: (id: number) => void;
-  addAuditLog: (log: Omit<AuditLog, "id" | "timestamp">) => void;
-  updateSettings: (s: Partial<AppSettings>) => void;
+  addEmployee: (e: Omit<Employee, "id">) => Promise<void>;
+  updateEmployee: (id: number, e: Partial<Employee>) => Promise<void>;
+  deleteEmployee: (id: number) => Promise<void>;
+  addAttendance: (a: Omit<AttendanceRecord, "id">) => Promise<void>;
+  updateAttendance: (id: number, a: Partial<AttendanceRecord>) => Promise<void>;
+  deleteAttendance: (id: number) => Promise<void>;
+  addLeave: (l: Omit<Leave, "id">) => Promise<void>;
+  updateLeave: (id: number, l: Partial<Leave>) => Promise<void>;
+  deleteLeave: (id: number) => Promise<void>;
+  addDepartment: (d: Omit<Department, "id" | "employeeCount">) => Promise<void>;
+  updateDepartment: (id: number, d: Partial<Department>) => Promise<void>;
+  deleteDepartment: (id: number) => Promise<boolean>;
+  addExpense: (e: Omit<Expense, "id">) => Promise<void>;
+  updateExpense: (id: number, e: Partial<Expense>) => Promise<void>;
+  deleteExpense: (id: number) => Promise<void>;
+  addAuditLog: (log: Omit<AuditLog, "id" | "timestamp">) => Promise<void>;
+  updateSettings: (s: Partial<AppSettings>) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
-
-const STORAGE_KEY = "malir-tonight-data";
-
-function loadState(): AppState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.settings) return parsed;
-    }
-  } catch {}
-  return getInitialState();
-}
-
-function saveState(state: AppState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-let idCounter = Date.now();
-function nextId(): number {
-  return ++idCounter;
-}
 
 const defaultSettings: AppSettings = {
   restaurantName: "Malir Tonight",
@@ -100,230 +81,212 @@ const defaultSettings: AppSettings = {
   },
 };
 
-function getInitialState(): AppState {
-  const employees: Employee[] = [
-    { id: 1, firstName: "Ahmed", lastName: "Khan", email: "ahmed@malir.com", phone: "0301-1234567", position: "Manager", department: "Management", hireDate: "2023-01-15", salary: 85000, status: "active" },
-    { id: 2, firstName: "Sara", lastName: "Ali", email: "sara@malir.com", phone: "0321-2345678", position: "Chef", department: "Kitchen", hireDate: "2023-03-20", salary: 65000, status: "active" },
-    { id: 3, firstName: "Hassan", lastName: "Raza", email: "hassan@malir.com", phone: "0333-3456789", position: "Waiter", department: "Service", hireDate: "2023-06-10", salary: 35000, status: "active" },
-    { id: 4, firstName: "Fatima", lastName: "Noor", email: "fatima@malir.com", phone: "0345-4567890", position: "Cashier", department: "Finance", hireDate: "2024-01-05", salary: 40000, status: "active" },
-    { id: 5, firstName: "Usman", lastName: "Tariq", email: "usman@malir.com", phone: "0300-5678901", position: "Sous Chef", department: "Kitchen", hireDate: "2023-09-01", salary: 55000, status: "inactive" },
-  ];
+function loadCachedState(): AppState {
+  try {
+    const raw = localStorage.getItem("malir-tonight-data");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.settings) return { ...parsed, loading: true, connected: false };
+    }
+  } catch {}
+  return {
+    employees: [], attendance: [], leaves: [], departments: [],
+    expenses: [], auditLogs: [], settings: defaultSettings,
+    loading: true, connected: false,
+  };
+}
 
-  const departments: Department[] = [
-    { id: 101, name: "Management", employeeCount: 1 },
-    { id: 102, name: "Kitchen", employeeCount: 2 },
-    { id: 103, name: "Service", employeeCount: 1 },
-    { id: 104, name: "Finance", employeeCount: 1 },
-  ];
-
-  const today = new Date().toISOString().split("T")[0];
-
-  const attendance: AttendanceRecord[] = [
-    { id: 201, employeeId: 1, employeeName: "Ahmed Khan", date: today, checkIn: "09:00", checkOut: "", status: "present", notes: "" },
-    { id: 202, employeeId: 2, employeeName: "Sara Ali", date: today, checkIn: "08:45", checkOut: "", status: "present", notes: "" },
-    { id: 203, employeeId: 3, employeeName: "Hassan Raza", date: today, checkIn: "09:15", checkOut: "", status: "late", notes: "Traffic" },
-    { id: 204, employeeId: 4, employeeName: "Fatima Noor", date: today, checkIn: "", checkOut: "", status: "absent", notes: "On leave" },
-  ];
-
-  const leaves: Leave[] = [
-    { id: 301, employeeId: 4, employeeName: "Fatima Noor", startDate: today, endDate: today, type: "sick", status: "approved", reason: "Feeling unwell" },
-    { id: 302, employeeId: 3, employeeName: "Hassan Raza", startDate: "2026-07-25", endDate: "2026-07-27", type: "vacation", status: "pending", reason: "Family trip" },
-  ];
-
-  const expenses: Expense[] = [
-    { id: 401, category: "Utilities", amount: 15000, description: "Electricity bill", date: "2026-07-01" },
-    { id: 402, category: "Inventory", amount: 45000, description: "Weekly grocery restock", date: "2026-07-05" },
-    { id: 403, category: "Maintenance", amount: 8000, description: "AC servicing", date: "2026-07-10" },
-    { id: 404, category: "Salary", amount: 280000, description: "Monthly payroll", date: "2026-07-01" },
-  ];
-
-  const auditLogs: AuditLog[] = [
-    { id: 501, action: "CREATE", entity: "Employee", entityId: 1, details: "Added Ahmed Khan", timestamp: "2023-01-15T10:00:00Z", user: "Admin" },
-    { id: 502, action: "UPDATE", entity: "Attendance", entityId: 3, details: "Marked Hassan Raza as late", timestamp: today + "T09:15:00Z", user: "System" },
-  ];
-
-  return { employees, attendance, leaves, departments, expenses, auditLogs, settings: defaultSettings };
+function saveCache(state: AppState) {
+  const { loading, connected, ...data } = state;
+  localStorage.setItem("malir-tonight-data", JSON.stringify(data));
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(loadState);
+  const [state, setState] = useState<AppState>(loadCachedState);
+
+  const refreshData = useCallback(async () => {
+    try {
+      const [employees, attendance, leaves, departments, expenses, auditLogs] = await Promise.all([
+        api.employees.list(),
+        api.attendance.list(),
+        api.leaves.list(),
+        api.departments.list(),
+        api.expenses.list(),
+        api.auditLogs.list(),
+      ]);
+
+      const serverSettings = await api.settings.get();
+
+      const mergedSettings: AppSettings = {
+        ...defaultSettings,
+        ...(serverSettings as Partial<AppSettings>),
+        notifications: {
+          ...defaultSettings.notifications,
+          ...((serverSettings as any)?.notifications || {}),
+        },
+      };
+
+      const next: AppState = {
+        employees, attendance, leaves, departments, expenses, auditLogs,
+        settings: mergedSettings, loading: false, connected: true,
+      };
+
+      setState(next);
+      saveCache(next);
+    } catch (err) {
+      console.warn("API unavailable, using cached data:", err);
+      setState((prev) => ({ ...prev, loading: false, connected: false }));
+    }
+  }, []);
 
   useEffect(() => {
-    saveState(state);
+    refreshData();
+    const interval = setInterval(refreshData, 30000);
+    return () => clearInterval(interval);
+  }, [refreshData]);
+
+  useEffect(() => {
+    if (!state.loading) saveCache(state);
   }, [state]);
 
-  const addEmployee = useCallback((e: Omit<Employee, "id">) => {
-    const id = nextId();
-    setState((prev) => ({
-      ...prev,
-      employees: [...prev.employees, { ...e, id }],
-    }));
-    addToSyncQueue("employee", String(id), "create", { ...e, id });
+  const addEmployee = useCallback(async (e: Omit<Employee, "id">) => {
+    const created = await api.employees.create(e);
+    setState((prev) => ({ ...prev, employees: [...prev.employees, created] }));
   }, []);
 
-  const updateEmployee = useCallback((id: number, data: Partial<Employee>) => {
+  const updateEmployee = useCallback(async (id: number, data: Partial<Employee>) => {
+    const updated = await api.employees.update(id, data);
     setState((prev) => ({
       ...prev,
-      employees: prev.employees.map((e) => (e.id === id ? { ...e, ...data } : e)),
+      employees: prev.employees.map((e) => (e.id === id ? updated : e)),
     }));
-    addToSyncQueue("employee", String(id), "update", { id, ...data });
   }, []);
 
-  const deleteEmployee = useCallback((id: number) => {
+  const deleteEmployee = useCallback(async (id: number) => {
+    await api.employees.delete(id);
     setState((prev) => ({
       ...prev,
       employees: prev.employees.filter((e) => e.id !== id),
       attendance: prev.attendance.filter((a) => a.employeeId !== id),
       leaves: prev.leaves.filter((l) => l.employeeId !== id),
     }));
-    addToSyncQueue("employee", String(id), "delete", { id });
   }, []);
 
-  const addAttendance = useCallback((a: Omit<AttendanceRecord, "id">) => {
-    const id = nextId();
+  const addAttendance = useCallback(async (a: Omit<AttendanceRecord, "id">) => {
+    const created = await api.attendance.create(a);
+    setState((prev) => ({ ...prev, attendance: [...prev.attendance, created] }));
+  }, []);
+
+  const updateAttendance = useCallback(async (id: number, data: Partial<AttendanceRecord>) => {
+    const updated = await api.attendance.update(id, data);
     setState((prev) => ({
       ...prev,
-      attendance: [...prev.attendance, { ...a, id }],
+      attendance: prev.attendance.map((a) => (a.id === id ? updated : a)),
     }));
-    addToSyncQueue("attendance", String(id), "create", { ...a, id });
   }, []);
 
-  const updateAttendance = useCallback((id: number, data: Partial<AttendanceRecord>) => {
-    setState((prev) => ({
-      ...prev,
-      attendance: prev.attendance.map((a) => (a.id === id ? { ...a, ...data } : a)),
-    }));
-    addToSyncQueue("attendance", String(id), "update", { id, ...data });
-  }, []);
-
-  const deleteAttendance = useCallback((id: number) => {
+  const deleteAttendance = useCallback(async (id: number) => {
+    await api.attendance.delete(id);
     setState((prev) => ({
       ...prev,
       attendance: prev.attendance.filter((a) => a.id !== id),
     }));
-    addToSyncQueue("attendance", String(id), "delete", { id });
   }, []);
 
-  const addLeave = useCallback((l: Omit<Leave, "id">) => {
-    const id = nextId();
+  const addLeave = useCallback(async (l: Omit<Leave, "id">) => {
+    const created = await api.leaves.create(l);
+    setState((prev) => ({ ...prev, leaves: [...prev.leaves, created] }));
+  }, []);
+
+  const updateLeave = useCallback(async (id: number, data: Partial<Leave>) => {
+    const updated = await api.leaves.update(id, data);
     setState((prev) => ({
       ...prev,
-      leaves: [...prev.leaves, { ...l, id }],
+      leaves: prev.leaves.map((l) => (l.id === id ? updated : l)),
     }));
-    addToSyncQueue("leave", String(id), "create", { ...l, id });
   }, []);
 
-  const updateLeave = useCallback((id: number, data: Partial<Leave>) => {
-    setState((prev) => ({
-      ...prev,
-      leaves: prev.leaves.map((l) => (l.id === id ? { ...l, ...data } : l)),
-    }));
-    addToSyncQueue("leave", String(id), "update", { id, ...data });
-  }, []);
-
-  const deleteLeave = useCallback((id: number) => {
+  const deleteLeave = useCallback(async (id: number) => {
+    await api.leaves.delete(id);
     setState((prev) => ({
       ...prev,
       leaves: prev.leaves.filter((l) => l.id !== id),
     }));
-    addToSyncQueue("leave", String(id), "delete", { id });
   }, []);
 
-  const addDepartment = useCallback((d: Omit<Department, "id" | "employeeCount">) => {
-    const id = nextId();
+  const addDepartment = useCallback(async (d: Omit<Department, "id" | "employeeCount">) => {
+    const created = await api.departments.create({ ...d, employeeCount: 0 });
+    setState((prev) => ({ ...prev, departments: [...prev.departments, created] }));
+  }, []);
+
+  const updateDepartment = useCallback(async (id: number, data: Partial<Department>) => {
+    const updated = await api.departments.update(id, data);
     setState((prev) => ({
       ...prev,
-      departments: [...prev.departments, { ...d, id, employeeCount: 0 }],
+      departments: prev.departments.map((d) => (d.id === id ? updated : d)),
     }));
-    addToSyncQueue("department", String(id), "create", { ...d, id });
   }, []);
 
-  const updateDepartment = useCallback((id: number, data: Partial<Department>) => {
-    setState((prev) => ({
-      ...prev,
-      departments: prev.departments.map((d) => (d.id === id ? { ...d, ...data } : d)),
-    }));
-    addToSyncQueue("department", String(id), "update", { id, ...data });
-  }, []);
-
-  const deleteDepartment = useCallback((id: number): boolean => {
-    let canDelete = true;
-    setState((prev) => {
-      const dept = prev.departments.find((d) => d.id === id);
-      if (dept && prev.employees.some((e) => e.department === dept.name)) {
-        canDelete = false;
-        return prev;
-      }
-      return { ...prev, departments: prev.departments.filter((d) => d.id !== id) };
-    });
-    if (canDelete) {
-      addToSyncQueue("department", String(id), "delete", { id });
+  const deleteDepartment = useCallback(async (id: number): Promise<boolean> => {
+    const dept = state.departments.find((d) => d.id === id);
+    if (dept && state.employees.some((e) => e.department === dept.name)) {
+      return false;
     }
-    return canDelete;
-  }, []);
-
-  const addExpense = useCallback((e: Omit<Expense, "id">) => {
-    const id = nextId();
+    await api.departments.delete(id);
     setState((prev) => ({
       ...prev,
-      expenses: [...prev.expenses, { ...e, id }],
+      departments: prev.departments.filter((d) => d.id !== id),
     }));
-    addToSyncQueue("expense", String(id), "create", { ...e, id });
+    return true;
+  }, [state.departments, state.employees]);
+
+  const addExpense = useCallback(async (e: Omit<Expense, "id">) => {
+    const created = await api.expenses.create(e);
+    setState((prev) => ({ ...prev, expenses: [...prev.expenses, created] }));
   }, []);
 
-  const updateExpense = useCallback((id: number, data: Partial<Expense>) => {
+  const updateExpense = useCallback(async (id: number, data: Partial<Expense>) => {
+    const updated = await api.expenses.update(id, data);
     setState((prev) => ({
       ...prev,
-      expenses: prev.expenses.map((e) => (e.id === id ? { ...e, ...data } : e)),
+      expenses: prev.expenses.map((e) => (e.id === id ? updated : e)),
     }));
-    addToSyncQueue("expense", String(id), "update", { id, ...data });
   }, []);
 
-  const deleteExpense = useCallback((id: number) => {
+  const deleteExpense = useCallback(async (id: number) => {
+    await api.expenses.delete(id);
     setState((prev) => ({
       ...prev,
       expenses: prev.expenses.filter((e) => e.id !== id),
     }));
-    addToSyncQueue("expense", String(id), "delete", { id });
   }, []);
 
-  const addAuditLog = useCallback((log: Omit<AuditLog, "id" | "timestamp">) => {
-    const id = nextId();
+  const addAuditLog = useCallback(async (log: Omit<AuditLog, "id" | "timestamp">) => {
+    const created = await api.auditLogs.create({ ...log, timestamp: new Date().toISOString() });
     setState((prev) => ({
       ...prev,
-      auditLogs: [{ ...log, id, timestamp: new Date().toISOString() }, ...prev.auditLogs],
+      auditLogs: [created, ...prev.auditLogs],
     }));
-    addToSyncQueue("audit_log", String(id), "create", { ...log, id });
   }, []);
 
-  const updateSettings = useCallback((s: Partial<AppSettings>) => {
-    setState((prev) => ({
-      ...prev,
-      settings: { ...prev.settings, ...s },
-    }));
+  const updateSettings = useCallback(async (s: Partial<AppSettings>) => {
+    setState((prev) => {
+      const updated = { ...prev.settings, ...s };
+      api.settings.update(updated).catch(console.error);
+      return { ...prev, settings: updated };
+    });
   }, []);
 
   return (
     <AppContext.Provider
       value={{
         ...state,
-        addEmployee,
-        updateEmployee,
-        deleteEmployee,
-        addAttendance,
-        updateAttendance,
-        deleteAttendance,
-        addLeave,
-        updateLeave,
-        deleteLeave,
-        addDepartment,
-        updateDepartment,
-        deleteDepartment,
-        addExpense,
-        updateExpense,
-        deleteExpense,
-        addAuditLog,
-        updateSettings,
+        addEmployee, updateEmployee, deleteEmployee,
+        addAttendance, updateAttendance, deleteAttendance,
+        addLeave, updateLeave, deleteLeave,
+        addDepartment, updateDepartment, deleteDepartment,
+        addExpense, updateExpense, deleteExpense,
+        addAuditLog, updateSettings, refreshData,
       }}
     >
       {children}

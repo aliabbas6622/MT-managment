@@ -5,13 +5,16 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
+    "server": "npx tsx server/index.ts",
+    "start": "npx tsx server/index.ts & vite",
     "build": "vite build && tsc -p tsconfig.electron.json && electron-builder",
     "preview": "vite preview",
     "electron:dev": "vite --config vite.config.ts",
     "electron:build": "vite build && tsc -p tsconfig.electron.json && electron-builder",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed-neon": "npx tsx prisma/seed-neon.ts"
   },
   "repository": {
     "type": "git",
@@ -22,14 +25,19 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "lucide-react": "^0.378.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
     "recharts": "^3.10.0",
-    "tailwind-merge": "^2.3.0"
+    "tailwind-merge": "^2.3.0",
+    "tsx": "^4.23.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",

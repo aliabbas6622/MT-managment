@@ -47,16 +47,16 @@ export default function Employees() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     const employeeData = { ...form, avatar: avatarPreview || undefined };
-    if (editingId) updateEmployee(editingId, employeeData);
-    else addEmployee(employeeData);
+    if (editingId) await updateEmployee(editingId, employeeData);
+    else await addEmployee(employeeData);
     setShowForm(false);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("Delete this employee? This will also remove their attendance and leave records.")) deleteEmployee(id);
+  const handleDelete = async (id: number) => {
+    if (confirm("Delete this employee? This will also remove their attendance and leave records.")) await deleteEmployee(id);
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

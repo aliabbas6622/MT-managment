@@ -27,7 +27,7 @@ export default function Leaves() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = () => { if (!validate()) return; if (editingId) updateLeave(editingId, form); else addLeave(form); setShowForm(false); };
+  const handleSubmit = async () => { if (!validate()) return; if (editingId) await updateLeave(editingId, form); else await addLeave(form); setShowForm(false); };
 
   return (
     <div className="space-y-6">

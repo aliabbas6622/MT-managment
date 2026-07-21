@@ -28,7 +28,7 @@ export default function Expenses() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = () => { if (!validate()) return; if (editingId) updateExpense(editingId, form); else addExpense(form); setShowForm(false); };
+  const handleSubmit = async () => { if (!validate()) return; if (editingId) await updateExpense(editingId, form); else await addExpense(form); setShowForm(false); };
 
   return (
     <div className="space-y-6">
@@ -75,7 +75,7 @@ export default function Expenses() {
                   <td className="p-3 text-slate-500">{exp.date}</td>
                   <td className="p-3 text-right space-x-1">
                     <button onClick={() => openEdit(exp)} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => { if (confirm("Delete?")) deleteExpense(exp.id); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={async () => { if (confirm("Delete?")) await deleteExpense(exp.id); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
                   </td>
                 </tr>
               ))

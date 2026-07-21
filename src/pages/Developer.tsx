@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useApp } from "../lib/store";
 import { useAuth, type Role } from "../lib/auth";
 import { useLicense } from "../lib/license";
+import { api } from "../services/api";
 import { getSyncStatus, type SyncStatusInfo } from "../services/sync.service";
 import {
   Terminal, Database, Users, Clock, CalendarOff, DollarSign,
@@ -292,24 +293,38 @@ export default function Developer() {
     }
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (confirm("WARNING: This will delete ALL data. Are you sure?")) {
+      try {
+        await api.sync.push({ employees: [], attendance: [], leaves: [], departments: [], expenses: [], auditLogs: [] });
+      } catch {}
       localStorage.removeItem(STORAGE_KEY);
       sessionStorage.removeItem(DEV_SESSION_KEY);
       window.location.reload();
     }
   };
 
-  const handleExportData = () => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return;
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExportData = async () => {
+    try {
+      const data = await api.sync.pull();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (!data) return;
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `malir-tonight-backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   const handleCreateBackup = () => {
@@ -366,8 +381,12 @@ export default function Developer() {
     showFeedback(simulateOffline ? "Back online (simulated)" : "Simulating offline mode...");
   };
 
-  const handleSeedDemo = () => {
+  const handleSeedDemo = async () => {
     localStorage.removeItem(STORAGE_KEY);
+    try {
+      const data = await api.sync.pull();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {}
     window.location.reload();
   };
 

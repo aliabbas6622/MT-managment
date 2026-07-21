@@ -22,7 +22,7 @@ export default function Login() {
     setLoading(false);
 
     if (result.success) {
-      navigate("/");
+      navigate(result.redirectTo || "/");
     } else {
       setError(result.error || "Login failed.");
     }

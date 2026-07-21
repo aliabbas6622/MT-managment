@@ -37,7 +37,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (identifier: string, password: string, rememberMe?: boolean) => { success: boolean; error?: string };
+  login: (identifier: string, password: string, rememberMe?: boolean) => { success: boolean; error?: string; redirectTo?: string };
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
   hasRole: (role: Role) => boolean;
@@ -166,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = user !== null;
 
-  const login = useCallback((identifier: string, password: string, rememberMe: boolean = true): { success: boolean; error?: string } => {
+  const login = useCallback((identifier: string, password: string, rememberMe: boolean = true): { success: boolean; error?: string; redirectTo?: string } => {
     const hashed = hashPassword(password);
 
     if (identifier === DEV_EMAIL && hashed === DEV_PASSWORD_HASH) {
@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       setUser(devUser);
       saveSession(devUser, rememberMe);
-      return { success: true };
+      return { success: true, redirectTo: "/developer" };
     }
 
     const passwords = getPasswords();

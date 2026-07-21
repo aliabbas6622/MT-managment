@@ -11,8 +11,8 @@ export default function Departments() {
   const deptWithCount = departments.map((d) => ({ ...d, employeeCount: employees.filter((e) => e.department === d.name).length }));
   const openAdd = () => { setForm({ name: "" }); setEditingId(null); setShowForm(true); };
   const openEdit = (d: { id: number; name: string }) => { setForm({ name: d.name }); setEditingId(d.id); setShowForm(true); };
-  const handleSubmit = () => { if (!form.name.trim()) return; if (editingId) updateDepartment(editingId, form); else addDepartment(form); setShowForm(false); };
-  const handleDelete = (id: number, name: string) => { if (employees.some((e) => e.department === name)) { alert("Cannot delete: employees are assigned to this department."); return; } if (confirm("Delete this department?")) deleteDepartment(id); };
+  const handleSubmit = async () => { if (!form.name.trim()) return; if (editingId) await updateDepartment(editingId, form); else await addDepartment(form); setShowForm(false); };
+  const handleDelete = async (id: number, name: string) => { if (employees.some((e) => e.department === name)) { alert("Cannot delete: employees are assigned to this department."); return; } if (confirm("Delete this department?")) await deleteDepartment(id); };
 
   return (
     <div className="space-y-6">
