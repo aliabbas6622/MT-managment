@@ -28,6 +28,7 @@ type SyncCallback = (status: SyncStatusInfo) => void;
 let syncInterval: ReturnType<typeof setInterval> | null = null;
 let retryTimeouts: ReturnType<typeof setTimeout>[] = [];
 const SAFETY_NET_INTERVAL_MS = 60000;
+const API_BASE = "https://api.malir-tonight.com";
 const MAX_RETRY_DELAY = 30000;
 const BASE_RETRY_DELAY = 1000;
 const MAX_RETRY_COUNT = 5;
@@ -171,7 +172,7 @@ async function processSyncQueue(): Promise<void> {
 }
 
 async function sendToCloud(item: SyncQueueItem): Promise<void> {
-  const cloudEndpoint = `https://api.malir-tonight.com/sync/${item.entityType}`;
+  const cloudEndpoint = `${API_BASE}/sync/${item.entityType}`;
 
   const response = await fetch(cloudEndpoint, {
     method: item.action === "delete" ? "DELETE" : item.action === "create" ? "POST" : "PUT",
@@ -226,7 +227,7 @@ async function syncFromCloud(): Promise<void> {
 
   for (const entityType of entityTypes) {
     try {
-      const cloudEndpoint = `https://api.malir-tonight.com/sync/${entityType}/pull`;
+      const cloudEndpoint = `${API_BASE}/sync/${entityType}/pull`;
       const response = await fetch(cloudEndpoint, {
         method: "GET",
         headers: { "Content-Type": "application/json" },

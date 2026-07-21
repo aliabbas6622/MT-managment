@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./lib/store";
 import { LicenseProvider } from "./lib/license";
 import { AuthProvider, useAuth } from "./lib/auth";
@@ -34,7 +34,7 @@ function AppInner() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/developer" element={<Developer />} />
@@ -53,7 +53,7 @@ function AppInner() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
