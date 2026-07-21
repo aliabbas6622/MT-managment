@@ -6,8 +6,9 @@ import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function Login() {
     setLoading(true);
     setError("");
 
-    const result = login(email, password);
+    const result = login(identifier, password, rememberMe);
     setLoading(false);
 
     if (result.success) {
@@ -42,14 +43,14 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-700">Email</label>
+              <label className="text-sm font-medium text-slate-700">Email or Username</label>
               <div className="relative mt-1">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                  placeholder="you@example.com"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => { setIdentifier(e.target.value); setError(""); }}
+                  placeholder="you@example.com or username"
                   className="w-full border border-slate-200 rounded-lg pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
                   required
                 />
@@ -76,6 +77,19 @@ export default function Login() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+              />
+              <label htmlFor="rememberMe" className="text-sm text-slate-600">
+                Remember me
+              </label>
             </div>
 
             {error && (

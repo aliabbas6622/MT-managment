@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./lib/store";
 import { LicenseProvider } from "./lib/license";
 import { AuthProvider, useAuth } from "./lib/auth";
@@ -34,9 +34,10 @@ function AppInner() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/developer" element={<Developer />} />
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="employees" element={<Employees />} />
@@ -49,11 +50,10 @@ function AppInner() {
           <Route path="settings" element={<Settings />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="users" element={<Users />} />
-          <Route path="developer" element={<Developer />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

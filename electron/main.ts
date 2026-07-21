@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, protocol } from "electron";
 import path from "path";
 
 const isDev = !app.isPackaged;
@@ -8,9 +8,11 @@ function createWindow() {
     width: 1280,
     height: 800,
     title: "Malir Tonight",
+    icon: path.join(__dirname, "../dist/favicon.ico"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false,
     },
   });
 

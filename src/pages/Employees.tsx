@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useApp } from "../lib/store";
 import type { Employee } from "../lib/types";
 import { formatStatus, formatCurrency } from "../lib/utils";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Camera } from "lucide-react";
 
 const emptyEmployee: Omit<Employee, "id"> = {
   firstName: "",
@@ -24,6 +24,8 @@ export default function Employees() {
   const [search, setSearch] = useState("");
   const [filterDept, setFilterDept] = useState("all");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = employees.filter((e) => {
     const matchSearch = `${e.firstName} ${e.lastName} ${e.email}`.toLowerCase().includes(search.toLowerCase());
@@ -31,8 +33,8 @@ export default function Employees() {
     return matchSearch && matchDept;
   });
 
-  const openAdd = () => { setForm(emptyEmployee); setEditingId(null); setErrors({}); setShowForm(true); };
-  const openEdit = (emp: Employee) => { setForm({ ...emp }); setEditingId(emp.id); setErrors({}); setShowForm(true); };
+  const openAdd = () => { setForm(emptyEmployee); setEditingId(null); setErrors({}); setAvatarPreview(null); setShowForm(true); };
+  const openEdit = (emp: Employee) => { setForm({ ...emp }); setEditingId(emp.id); setErrors({}); setAvatarPreview(emp.avatar || null); setShowForm(true); };
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
@@ -47,13 +49,32 @@ export default function Employees() {
 
   const handleSubmit = () => {
     if (!validate()) return;
-    if (editingId) updateEmployee(editingId, form);
-    else addEmployee(form);
+    const employeeData = { ...form, avatar: avatarPreview || undefined };
+    if (editingId) updateEmployee(editingId, employeeData);
+    else addEmployee(employeeData);
     setShowForm(false);
   };
 
   const handleDelete = (id: number) => {
     if (confirm("Delete this employee? This will also remove their attendance and leave records.")) deleteEmployee(id);
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatarPreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeAvatar = () => {
+    setAvatarPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -93,7 +114,18 @@ export default function Employees() {
             ) : (
               filtered.map((emp) => (
                 <tr key={emp.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
-                  <td className="p-3 font-medium text-slate-800">{emp.firstName} {emp.lastName}</td>
+                  <td className="p-3 font-medium text-slate-800">
+                    <div className="flex items-center gap-3">
+                      {emp.avatar ? (
+                        <img src={emp.avatar} alt={`${emp.firstName} ${emp.lastName}`} className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-medium">
+                          {emp.firstName[0]}{emp.lastName[0]}
+                        </div>
+                      )}
+                      <span>{emp.firstName} {emp.lastName}</span>
+                    </div>
+                  </td>
                   <td className="p-3 text-slate-500">{emp.email}</td>
                   <td className="p-3 text-slate-500">{emp.phone}</td>
                   <td className="p-3 text-slate-700">{emp.position}</td>
@@ -120,7 +152,43 @@ export default function Employees() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 border border-slate-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-800">{editingId ? "Edit Employee" : "Add Employee"}</h2>
-              <button onClick={() => setShowForm(false)} className="hover:bg-slate-100 rounded-lg p-1.5 transition-colors"><X className="h-5 w-5 text-slate-400" /></button>
+              <button onClick={() => { setShowForm(false); setAvatarPreview(null); }} className="hover:bg-slate-100 rounded-lg p-1.5 transition-colors"><X className="h-5 w-5 text-slate-400" /></button>
+            </div>
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                {avatarPreview ? (
+                  <div className="relative group">
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="w-24 h-24 rounded-full object-cover border-2 border-emerald-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeAvatar}
+                      className="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:border-emerald-400 hover:text-emerald-500 transition-colors"
+                  >
+                    <Camera className="h-6 w-6" />
+                    <span className="text-xs mt-1">Upload</span>
+                  </button>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -152,7 +220,7 @@ export default function Employees() {
               </select>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-700">Cancel</button>
+              <button onClick={() => { setShowForm(false); setAvatarPreview(null); }} className="px-4 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-700">Cancel</button>
               <button onClick={handleSubmit} className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium">Save</button>
             </div>
           </div>

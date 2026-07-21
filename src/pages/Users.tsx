@@ -15,6 +15,7 @@ export default function Users() {
 
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   const [newRole, setNewRole] = useState<Role>("viewer");
   const [newPassword, setNewPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -28,11 +29,12 @@ export default function Users() {
   const handleCreateUser = () => {
     setFormError("");
     setFormSuccess("");
-    const result = addUser({ name: newName, email: newEmail, role: newRole, password: newPassword });
+    const result = addUser({ name: newName, email: newEmail, role: newRole, password: newPassword, username: newUsername || undefined });
     if (result.success) {
       setFormSuccess(`User "${newName}" created as ${newRole}.`);
       setNewName("");
       setNewEmail("");
+      setNewUsername("");
       setNewPassword("");
       setNewRole("viewer");
     } else {
@@ -112,6 +114,16 @@ export default function Users() {
                 className="w-full border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
               />
             </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-slate-700">Username <span className="text-slate-400">(optional)</span></label>
+            <input
+              type="text"
+              placeholder="Optional username"
+              value={newUsername}
+              onChange={(e) => { setNewUsername(e.target.value); setFormError(""); setFormSuccess(""); }}
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400"
+            />
           </div>
           <div>
             <label className="text-sm font-medium text-slate-700">Role</label>

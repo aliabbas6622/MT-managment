@@ -29,6 +29,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  username?: string;
   role: Role;
   createdAt: string;
 }
@@ -36,12 +37,12 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => { success: boolean; error?: string };
+  login: (identifier: string, password: string, rememberMe?: boolean) => { success: boolean; error?: string };
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
   hasRole: (role: Role) => boolean;
   getUsers: () => User[];
-  addUser: (data: { name: string; email: string; role: Role; password: string }) => { success: boolean; error?: string };
+  addUser: (data: { name: string; email: string; role: Role; password: string; username?: string }) => { success: boolean; error?: string };
   updateUser: (id: string, data: Partial<User>) => { success: boolean; error?: string };
   deleteUser: (id: string) => { success: boolean; error?: string };
   changePassword: (id: string, newPassword: string) => { success: boolean; error?: string };
@@ -124,17 +125,23 @@ function saveUsers(users: User[]): void {
 
 function loadSession(): User | null {
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
   return null;
 }
 
-function saveSession(user: User | null): void {
+function saveSession(user: User | null, remember: boolean = true): void {
   if (user) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    const data = JSON.stringify(user);
+    if (remember) {
+      localStorage.setItem(SESSION_KEY, data);
+    } else {
+      sessionStorage.setItem(SESSION_KEY, data);
+    }
   } else {
     localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
   }
 }
 
@@ -155,22 +162,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = user !== null;
 
-  const login = useCallback((email: string, password: string): { success: boolean; error?: string } => {
+  const login = useCallback((identifier: string, password: string, rememberMe: boolean = true): { success: boolean; error?: string } => {
     const passwords = getPasswords();
     const hashed = hashPassword(password);
 
-    if (passwords[email] !== hashed) {
-      return { success: false, error: "Invalid email or password." };
+    if (passwords[identifier] !== hashed) {
+      return { success: false, error: "Invalid credentials." };
     }
 
     const users = loadUsers();
-    const found = users.find((u) => u.email === email);
+    const found = users.find((u) => u.email === identifier || u.username === identifier);
     if (!found) {
       return { success: false, error: "User not found." };
     }
 
     setUser(found);
-    saveSession(found);
+    saveSession(found, rememberMe);
     return { success: true };
   }, []);
 
@@ -193,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return loadUsers();
   }, []);
 
-  const addUser = useCallback((data: { name: string; email: string; role: Role; password: string }): { success: boolean; error?: string } => {
+  const addUser = useCallback((data: { name: string; email: string; role: Role; password: string; username?: string }): { success: boolean; error?: string } => {
     const users = loadUsers();
     const passwords = getPasswords();
 
@@ -204,11 +211,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (users.some((u) => u.email === data.email)) {
       return { success: false, error: "A user with this email already exists." };
     }
+    if (data.username && users.some((u) => u.username === data.username)) {
+      return { success: false, error: "This username is already taken." };
+    }
 
     const newUser: User = {
       id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       name: data.name.trim(),
       email: data.email.trim(),
+      username: data.username?.trim() || undefined,
       role: data.role,
       createdAt: new Date().toISOString(),
     };
