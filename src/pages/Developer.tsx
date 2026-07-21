@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 
 const DEV_SESSION_KEY = "mt-dev-session";
-const DEV_PASSWORD = "malir-dev-2026";
+const DEV_PASSWORD = "ali6622";
+const DEV_EMAIL = "aliabbas6622tel@gmail.com";
 const STORAGE_KEY = "malir-tonight-data";
 const SYNC_QUEUE_KEY = "malirTonight_syncQueue";
 const ERROR_LOG_KEY = "mt_dev_error_log";
@@ -239,11 +240,11 @@ export default function Developer() {
   };
 
   const handleLogin = () => {
-    if (password === DEV_PASSWORD) {
+    if (password === DEV_PASSWORD || password === DEV_EMAIL) {
       sessionStorage.setItem(DEV_SESSION_KEY, "true");
       setAuthenticated(true);
     } else {
-      alert("Invalid developer password");
+      alert("Invalid developer credentials");
     }
   };
 
@@ -383,10 +384,10 @@ export default function Developer() {
             <Terminal className="h-8 w-8 text-slate-500" />
           </div>
           <h1 className="text-xl font-bold text-slate-900">Developer Access</h1>
-          <p className="text-sm text-slate-500">Enter the developer password to continue.</p>
+          <p className="text-sm text-slate-500">Enter developer credentials to continue.</p>
           <input
-            type="password"
-            placeholder="Password"
+            type="email"
+            placeholder="Email"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLogin()}
